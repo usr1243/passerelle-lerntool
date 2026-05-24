@@ -800,6 +800,138 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .full-width { width: 100%; }
 
     /* ============================================================
+       PRÜFUNGS-COUNTDOWN
+       ============================================================ */
+    .countdown-card {
+      background: linear-gradient(135deg, var(--blue-light) 0%, #e8f0f7 100%);
+      border: 1px solid var(--blue-mid);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.5rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .countdown-left { flex: 1; min-width: 140px; }
+    .countdown-label { font-size: 0.72rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+    .countdown-days {
+      font-family: var(--font-serif);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .countdown-days.urgent { color: var(--terracotta); }
+    .countdown-days.soon   { color: var(--yellow); }
+    .countdown-sub { font-size: 0.78rem; color: var(--text-light); margin-top: 0.2rem; }
+    .countdown-input-wrap { display: flex; flex-direction: column; gap: 0.3rem; }
+    .countdown-input-wrap label { font-size: 0.68rem; font-weight: 700; color: var(--text-xlight); text-transform: uppercase; letter-spacing: 0.05em; }
+    .countdown-input-wrap input[type="date"] { width: auto; padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+
+    /* ============================================================
+       CLUSTER-NOTENTRACKER
+       ============================================================ */
+    .cluster-grid { display: grid; gap: 0.85rem; }
+    .cluster-item {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      transition: border-color var(--transition);
+    }
+    .cluster-item.cluster-ok     { border-left: 4px solid var(--green); }
+    .cluster-item.cluster-warn   { border-left: 4px solid var(--yellow); }
+    .cluster-item.cluster-danger { border-left: 4px solid var(--terracotta); }
+    .cluster-item.cluster-empty  { border-left: 4px solid var(--border-strong); }
+    .cluster-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .cluster-name { font-family: var(--font-serif); font-size: 0.95rem; font-weight: 600; font-style: italic; }
+    .cluster-avg {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 0.1rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+    .cluster-avg.avg-ok     { color: var(--green);      background: var(--green-light); }
+    .cluster-avg.avg-warn   { color: var(--yellow);     background: var(--yellow-light); }
+    .cluster-avg.avg-danger { color: var(--terracotta); background: var(--terracotta-light); }
+    .cluster-avg.avg-empty  { color: var(--text-xlight); background: var(--bg-subtle); }
+    .cluster-subjects { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .subject-note-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .subject-note-label { font-size: 0.62rem; color: var(--text-xlight); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .subject-note-input {
+      width: 52px;
+      text-align: center;
+      padding: 0.3rem 0.4rem;
+      font-size: 0.9rem;
+      font-family: var(--font-serif);
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+    }
+    .subject-note-input:focus { border-color: var(--blue); }
+    .passing-summary {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .passing-summary.on-track  { background: var(--green-light);      color: var(--green);      border: 1px solid var(--green-mid); }
+    .passing-summary.at-risk   { background: var(--yellow-light);     color: var(--yellow);     border: 1px solid #e8d5a0; }
+    .passing-summary.critical  { background: var(--terracotta-light); color: var(--terracotta); border: 1px solid #f0c0bb; }
+    .passing-summary.no-data   { background: var(--bg-subtle);        color: var(--text-light); border: 1px solid var(--border); }
+    .weakest-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--yellow-light); color: var(--yellow);
+      border: 1px solid #e8d5a0;
+      padding: 0.3rem 0.7rem; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 700; margin-top: 0.5rem;
+    }
+
+    /* ============================================================
+       NOTFALL-TOOLS (C2)
+       ============================================================ */
+    .egalwenn-list { list-style: none; margin: 0.75rem 0; }
+    .egalwenn-item {
+      padding: 0.65rem 0.9rem;
+      background: var(--green-light);
+      border: 1px solid var(--green-mid);
+      border-radius: var(--radius);
+      margin-bottom: 0.45rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--green);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .egalwenn-del { background: none; border: none; cursor: pointer; color: var(--green); opacity: 0.5; font-size: 1rem; flex-shrink: 0; padding: 0; }
+    .egalwenn-del:hover { opacity: 1; }
+    .five-min-timer {
+      font-family: var(--font-serif);
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--green);
+      text-align: center;
+      margin: 1rem 0;
+      letter-spacing: -0.02em;
+    }
+    .worst-case-item {
+      padding: 0.75rem 1rem;
+      background: var(--bg-subtle);
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+    }
+    .worst-case-q { font-size: 0.75rem; font-weight: 700; color: var(--text-xlight); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .worst-case-a { font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+    .worst-case-a.good { color: var(--green); font-weight: 600; }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 520px) {
@@ -845,6 +977,19 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <div class="greeting">
       <div class="greeting-date" id="greetingDate"></div>
       <div class="greeting-title" id="greetingTitle">Guten Morgen!</div>
+    </div>
+
+    <!-- Prüfungs-Countdown -->
+    <div class="countdown-card" id="countdownCard">
+      <div class="countdown-left">
+        <div class="countdown-label">⏳ Bis zur Passerelle-Prüfung</div>
+        <div class="countdown-days" id="countdownDays">– – –</div>
+        <div class="countdown-sub" id="countdownSub">Prüfungsdatum rechts eintragen →</div>
+      </div>
+      <div class="countdown-input-wrap">
+        <label for="pruefungsDatumInput">Prüfungsdatum</label>
+        <input type="date" id="pruefungsDatumInput" onchange="savePruefungsDatum(this.value)">
+      </div>
     </div>
 
     <div class="motivation-box" id="motivationBox"
@@ -1010,6 +1155,17 @@ Inhalte anpassen (ohne Programmierkenntnisse):
        ============================================================ -->
   <div id="panel-plan" class="panel" role="tabpanel">
 
+    <!-- Cluster-Notentracker -->
+    <div class="card">
+      <div class="card-title">Wo stehe ich? — Cluster-Übersicht</div>
+      <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.7;">
+        Die Passerelle bewertet in <strong>5 Gruppen</strong> (Cluster). Du brauchst einen Schnitt von mindestens 4.0, maximal 2 Noten unter 4.0 und keine Note unter 2.0.<br>
+        Trag deine aktuelle Selbsteinschätzung ein (1 = kann ich gar nicht, 6 = sitzt sicher). Das zeigt dir, wo du zuerst ansetzen musst.
+      </p>
+      <div class="cluster-grid" id="clusterGrid"></div>
+      <div id="clusterSummary"></div>
+    </div>
+
     <!-- Wochenplan -->
     <div class="card">
       <div class="flex-between" style="margin-bottom:1rem;">
@@ -1086,6 +1242,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
           <div class="emergency-option-title">🃏 Nur eine einzige Aufgabe</div>
           <div class="emergency-option-desc">Direkt zum Stoff – erste unfertige Aufgabe aufmachen</div>
         </button>
+        <button class="emergency-option" onclick="show5MinutenRegel()">
+          <div class="emergency-option-title">⏱ 5-Minuten-Regel</div>
+          <div class="emergency-option-desc">Wenn nichts mehr geht: nur 5 Minuten. Einfach anfangen — meistens werden daraus 25.</div>
+        </button>
+        <button class="emergency-option" onclick="showWorstCase()">
+          <div class="emergency-option-title">🧠 Worst-Case durchdenken</div>
+          <div class="emergency-option-desc">Was ist das Schlimmste, das passieren kann? Meistens viel weniger schlimm als gedacht.</div>
+        </button>
+        <button class="emergency-option" onclick="showEgalWenn()">
+          <div class="emergency-option-title">💚 Egal-wenn-Liste</div>
+          <div class="emergency-option-desc">Entlastende Sätze — dein Erlaubniszettel für unvollständige Tage.</div>
+        </button>
       </div>
       <button class="btn btn-outline full-width" onclick="closeEmergency()">Schliessen</button>
     </div>
@@ -1105,6 +1273,55 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div class="walk-timer" id="walkTimer">20:00</div>
       <div class="overlay-sub">Leg das Gerät weg.<br>Du machst genau das Richtige.</div>
       <button class="btn btn-outline mt-md" onclick="stopWalk()">Zurück</button>
+    </div>
+
+    <!-- 5-Minuten-Regel -->
+    <div id="fiveMinView" class="hidden">
+      <div class="overlay-title">5-Minuten-Regel</div>
+      <div class="overlay-sub" style="margin-bottom:0.5rem;">Setz dich nur für 5 Minuten hin. Eine einzige Karteikarte. Das reicht.<br>In 80% der Fälle werden daraus 25 Minuten — aber das ist kein Ziel, nur ein Bonus.</div>
+      <div class="five-min-timer" id="fiveMinDisplay">05:00</div>
+      <div class="flex-gap" style="justify-content:center; margin-top:0.5rem;">
+        <button class="btn btn-success" id="fiveMinBtn" onclick="toggleFiveMin()">▶ Starten</button>
+        <button class="btn btn-outline" onclick="stopFiveMin()">Zurück</button>
+      </div>
+    </div>
+
+    <!-- Worst-Case-Reframe -->
+    <div id="worstCaseView" class="hidden">
+      <div class="overlay-title">Worst-Case durchdenken</div>
+      <div class="overlay-sub">Durchdenk das Schlimmste — meistens verliert es dann seinen Schrecken.</div>
+      <div style="margin-top:1rem;">
+        <div class="worst-case-item">
+          <div class="worst-case-q">Was ist das Schlimmste, das passieren kann?</div>
+          <div class="worst-case-a">Die Passerelle nicht bestehen.</div>
+        </div>
+        <div class="worst-case-item">
+          <div class="worst-case-q">Was dann?</div>
+          <div class="worst-case-a">Einmalige Wiederholung möglich (offiziell vom SBFI vorgesehen). Oder Einstieg an der Fachhochschule mit der Berufsmatur — die ist bereits vorhanden.</div>
+        </div>
+        <div class="worst-case-item">
+          <div class="worst-case-q">Ist das ein Lebensende?</div>
+          <div class="worst-case-a good">Nein. Es ist ein Umweg, kein Abgrund.</div>
+        </div>
+        <div class="worst-case-item">
+          <div class="worst-case-q">Was ist das Realistischste, das passiert?</div>
+          <div class="worst-case-a">Du schaffst es. Lea hat es geschafft. Nils hat es geschafft. Franz hat es geschafft. Und die haben auch gezweifelt.</div>
+        </div>
+      </div>
+      <button class="btn btn-outline full-width mt-md" onclick="stopWorstCase()">Zurück</button>
+    </div>
+
+    <!-- Egal-wenn-Liste -->
+    <div id="egalWennView" class="hidden">
+      <div class="overlay-title">Egal-wenn-Liste</div>
+      <div class="overlay-sub">Dein Erlaubniszettel. Schreib Sätze, die dir Druck nehmen. Lies sie, wenn du dich schlecht fühlst.</div>
+      <ul class="egalwenn-list" id="egalWennList"></ul>
+      <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+        <input type="text" id="egalWennInput" placeholder="z.B. Es ist okay, wenn ich heute nur 2h lerne." maxlength="100"
+               onkeydown="if(event.key==='Enter'&&!event.isComposing)addEgalWenn()">
+        <button class="btn btn-success" onclick="addEgalWenn()">Hinzu</button>
+      </div>
+      <button class="btn btn-outline full-width mt-md" onclick="stopEgalWenn()">Zurück</button>
     </div>
 
   </div>
@@ -1244,8 +1461,12 @@ let state = {
   sessions:  [],
   journal:   [],
   reviews:   [],
-  settings:  { pomDur: 25, pomBreak: 5 },
+  settings:  { pomDur: 25, pomBreak: 5, pruefungsDatum: '' },
   motIndex:  0,
+  // Notentracker: Selbsteinschätzung 1–6 pro Fach (null = noch nicht gesetzt)
+  noten: { Deutsch: null, Englisch: null, Mathematik: null, Biologie: null, Chemie: null, Physik: null, Geografie: null, Geschichte: null },
+  // Egal-wenn-Liste: eigene entlastende Sätze
+  egalWenn: [],
 };
 
 // Pomodoro-Laufzustand (nicht persistiert)
@@ -1318,6 +1539,8 @@ function loadFromStorage() {
     if (parsed.triage  && typeof parsed.triage  === 'object' && parsed.triage  !== null) state.triage  = parsed.triage;
     if (parsed.weekPlan && typeof parsed.weekPlan === 'object' && parsed.weekPlan !== null) state.weekPlan = parsed.weekPlan;
     if (typeof parsed.motIndex === 'number') state.motIndex = parsed.motIndex;
+    if (parsed.noten && typeof parsed.noten === 'object' && parsed.noten !== null) state.noten = { ...state.noten, ...parsed.noten };
+    if (Array.isArray(parsed.egalWenn)) state.egalWenn = parsed.egalWenn;
     // Fehlende Fächer aus Default ergänzen
     Object.keys(defaultTriage).forEach(s => {
       if (!state.triage[s]) state.triage[s] = JSON.parse(JSON.stringify(defaultTriage[s]));
@@ -1933,7 +2156,7 @@ function showEmergency() {
 
 function closeEmergency() {
   document.getElementById('emergencyOverlay').classList.add('hidden');
-  stopBreathing(); stopWalk();
+  stopBreathing(); stopWalk(); stopFiveMin();
 }
 
 // Box-Atmung 4-4-4-4
@@ -2018,17 +2241,239 @@ document.getElementById('emergencyOverlay').addEventListener('click', e => {
 });
 
 // ============================================================
+// PRÜFUNGS-COUNTDOWN
+// ============================================================
+function savePruefungsDatum(val) {
+  state.settings.pruefungsDatum = val;
+  save();
+  renderCountdown();
+}
+
+function renderCountdown() {
+  const el = document.getElementById('countdownDays');
+  const sub = document.getElementById('countdownSub');
+  const inp = document.getElementById('pruefungsDatumInput');
+  if (state.settings.pruefungsDatum) inp.value = state.settings.pruefungsDatum;
+  if (!state.settings.pruefungsDatum) {
+    el.textContent = '– – –';
+    sub.textContent = 'Prüfungsdatum rechts eintragen →';
+    el.className = 'countdown-days';
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const exam  = new Date(state.settings.pruefungsDatum + 'T00:00:00');
+  const diff  = Math.round((exam - today) / 86400000);
+  if (diff < 0) {
+    el.textContent = 'Geschafft!';
+    sub.textContent = 'Die Prüfung liegt hinter dir.';
+    el.className = 'countdown-days';
+  } else if (diff === 0) {
+    el.textContent = 'Heute!';
+    sub.textContent = 'Heute ist Prüfungstag. Du schaffst das.';
+    el.className = 'countdown-days urgent';
+  } else {
+    el.textContent = diff + ' Tage';
+    sub.textContent = 'bis ' + new Date(state.settings.pruefungsDatum + 'T12:00:00').toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+    el.className = 'countdown-days' + (diff <= 14 ? ' urgent' : diff <= 30 ? ' soon' : '');
+  }
+}
+
+// ============================================================
+// CLUSTER-NOTENTRACKER
+// ============================================================
+const CLUSTERS = [
+  { name: 'Mathematik',               fächer: ['Mathematik'],             hint: 'Entscheidet die Prüfung — 35–45% deiner Lernzeit.' },
+  { name: 'Naturwissenschaften',      fächer: ['Biologie','Chemie','Physik'], hint: 'Bio, Chemie, Physik — Schnitt dieser drei Fächer.' },
+  { name: 'Deutsch',                  fächer: ['Deutsch'],                hint: 'Inkl. Lektüre — früh mit Büchern lesen beginnen.' },
+  { name: 'Englisch',                 fächer: ['Englisch'],               hint: 'Vokabeln täglich halten den Aufwand klein.' },
+  { name: 'Geistes- & Sozialwiss.',   fächer: ['Geografie','Geschichte'], hint: 'Geo + Geschichte — fertige Zusammenfassungen nutzen.' },
+];
+
+function clusterAvg(fächer) {
+  const vals = fächer.map(f => state.noten[f]).filter(v => v !== null && v !== '' && !isNaN(v));
+  if (!vals.length) return null;
+  return vals.reduce((a,b) => a + parseFloat(b), 0) / vals.length;
+}
+
+function saveNote(fach, val) {
+  const v = val === '' ? null : parseFloat(val);
+  state.noten[fach] = (v !== null && !isNaN(v) && v >= 1 && v <= 6) ? v : null;
+  save();
+  renderCluster();
+}
+
+function renderCluster() {
+  const grid = document.getElementById('clusterGrid');
+  const summary = document.getElementById('clusterSummary');
+  if (!grid) return;
+
+  grid.innerHTML = CLUSTERS.map(c => {
+    const avg = clusterAvg(c.fächer);
+    const avgStr = avg !== null ? avg.toFixed(1) : '–';
+    let itemCls = 'cluster-empty', avgCls = 'avg-empty';
+    if (avg !== null) {
+      if (avg >= 4.0)      { itemCls = 'cluster-ok';     avgCls = 'avg-ok'; }
+      else if (avg >= 3.0) { itemCls = 'cluster-warn';   avgCls = 'avg-warn'; }
+      else                 { itemCls = 'cluster-danger';  avgCls = 'avg-danger'; }
+    }
+    const subjects = c.fächer.map(f => `
+      <div class="subject-note-wrap">
+        <div class="subject-note-label">${esc(f)}</div>
+        <input class="subject-note-input" type="number" min="1" max="6" step="0.5"
+               value="${state.noten[f] !== null ? state.noten[f] : ''}"
+               placeholder="–"
+               onchange="saveNote('${esc(f)}', this.value)"
+               aria-label="Note ${esc(f)}">
+      </div>`).join('');
+    return `
+      <div class="cluster-item ${itemCls}">
+        <div class="cluster-header">
+          <div>
+            <div class="cluster-name">${esc(c.name)}</div>
+            <div style="font-size:0.72rem; color:var(--text-xlight); margin-top:0.1rem;">${esc(c.hint)}</div>
+          </div>
+          <div class="cluster-avg ${avgCls}">${avgStr}</div>
+        </div>
+        <div class="cluster-subjects">${subjects}</div>
+      </div>`;
+  }).join('');
+
+  // Bestehens-Zusammenfassung
+  const avgs = CLUSTERS.map(c => clusterAvg(c.fächer));
+  const known = avgs.filter(v => v !== null);
+  if (!known.length) {
+    summary.innerHTML = '<div class="passing-summary no-data">Trag Noten ein um zu sehen, wie du stehst.</div>';
+    return;
+  }
+  const globalAvg = known.reduce((a,b) => a+b, 0) / known.length;
+  const failing = known.filter(v => v < 4.0).length;
+  const critical = known.filter(v => v < 2.0).length;
+  // Schwächstes Fach finden
+  let weakestCluster = null, weakestAvg = 7;
+  CLUSTERS.forEach((c,i) => { if (avgs[i] !== null && avgs[i] < weakestAvg) { weakestAvg = avgs[i]; weakestCluster = c.name; } });
+
+  let cls, msg;
+  if (critical > 0)       { cls = 'critical'; msg = '⚠️ Kritisch: Mind. ein Cluster unter 2.0 — sofort Priorität setzen!'; }
+  else if (failing > 2)   { cls = 'critical'; msg = `⚠️ ${failing} Cluster unter 4.0 — mehr als erlaubt. Fokus auf schwächste Fächer.`; }
+  else if (failing > 0)   { cls = 'at-risk';  msg = `${failing} Cluster unter 4.0 — noch im Rahmen, aber beobachten.`; }
+  else                     { cls = 'on-track'; msg = `✓ Alle bekannten Cluster über 4.0 — weiter so!`; }
+
+  summary.innerHTML = `
+    <div class="passing-summary ${cls}">${msg}</div>
+    ${weakestCluster ? `<div style="text-align:center;"><span class="weakest-badge">⚡ Schwächstes Fach: ${esc(weakestCluster)} (${weakestAvg.toFixed(1)}) — hier zuerst lernen</span></div>` : ''}
+  `;
+}
+
+// ============================================================
+// 5-MINUTEN-REGEL
+// ============================================================
+let fiveMinIv = null, fiveMinRunning = false, fiveMinSecs = 300;
+
+function show5MinutenRegel() {
+  document.getElementById('emergencyMain').classList.add('hidden');
+  document.getElementById('fiveMinView').classList.remove('hidden');
+  fiveMinSecs = 300; fiveMinRunning = false;
+  clearInterval(fiveMinIv);
+  document.getElementById('fiveMinDisplay').textContent = '05:00';
+  document.getElementById('fiveMinBtn').textContent = '▶ Starten';
+}
+
+function toggleFiveMin() {
+  if (fiveMinRunning) {
+    clearInterval(fiveMinIv); fiveMinRunning = false;
+    document.getElementById('fiveMinBtn').textContent = '▶ Weiter';
+  } else {
+    fiveMinRunning = true;
+    document.getElementById('fiveMinBtn').textContent = '⏸ Pause';
+    fiveMinIv = setInterval(() => {
+      fiveMinSecs--;
+      const m = Math.floor(fiveMinSecs / 60), s = fiveMinSecs % 60;
+      document.getElementById('fiveMinDisplay').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      if (fiveMinSecs <= 0) {
+        clearInterval(fiveMinIv); fiveMinRunning = false;
+        document.getElementById('fiveMinDisplay').textContent = 'Geschafft!';
+        document.getElementById('fiveMinBtn').textContent = '✓ Fertig';
+        beep(660, 0.3);
+      }
+    }, 1000);
+  }
+}
+
+function stopFiveMin() {
+  clearInterval(fiveMinIv); fiveMinRunning = false;
+  document.getElementById('fiveMinView').classList.add('hidden');
+  document.getElementById('emergencyMain').classList.remove('hidden');
+}
+
+// ============================================================
+// WORST-CASE-REFRAME
+// ============================================================
+function showWorstCase() {
+  document.getElementById('emergencyMain').classList.add('hidden');
+  document.getElementById('worstCaseView').classList.remove('hidden');
+}
+function stopWorstCase() {
+  document.getElementById('worstCaseView').classList.add('hidden');
+  document.getElementById('emergencyMain').classList.remove('hidden');
+}
+
+// ============================================================
+// EGAL-WENN-LISTE
+// ============================================================
+function showEgalWenn() {
+  document.getElementById('emergencyMain').classList.add('hidden');
+  document.getElementById('egalWennView').classList.remove('hidden');
+  renderEgalWenn();
+}
+
+function renderEgalWenn() {
+  const list = document.getElementById('egalWennList');
+  if (!state.egalWenn.length) {
+    list.innerHTML = '<li style="color:var(--text-xlight);font-size:0.85rem;padding:0.5rem 0;">Noch keine Einträge. Schreib einen entlastenden Satz unten.</li>';
+    return;
+  }
+  list.innerHTML = state.egalWenn.map((s, i) => `
+    <li class="egalwenn-item">
+      <span>${esc(s)}</span>
+      <button class="egalwenn-del" onclick="deleteEgalWenn(${i})" aria-label="Eintrag löschen">✕</button>
+    </li>`).join('');
+}
+
+function addEgalWenn() {
+  const inp = document.getElementById('egalWennInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  state.egalWenn.push(val);
+  inp.value = '';
+  save();
+  renderEgalWenn();
+}
+
+function deleteEgalWenn(i) {
+  state.egalWenn.splice(i, 1);
+  save();
+  renderEgalWenn();
+}
+
+function stopEgalWenn() {
+  document.getElementById('egalWennView').classList.add('hidden');
+  document.getElementById('emergencyMain').classList.remove('hidden');
+}
+
+// ============================================================
 // ALLES RENDERN
 // ============================================================
 function renderAll() {
   renderGreeting();
   renderMotivation();
+  renderCountdown();
   renderTasks();
   renderStats();
   renderProgressBars();
   renderJournal();
   renderSubjectTabs();
   renderTopics();
+  renderCluster();
   renderWeekPlan();
   renderReviews();
   renderSessionLog();
