@@ -898,8 +898,10 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label" for="newTaskTopic">Thema / Aufgabe</label>
+          <!-- Bug #11: isComposing verhindert Doppel-Submit bei Autocomplete; Bug #12: maxlength -->
           <input type="text" id="newTaskTopic" placeholder="z.B. Zellatmung S. 12–18 lesen + 5 Karteikarten"
-                 onkeydown="if(event.key==='Enter')addTask()">
+                 maxlength="120"
+                 onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();addTask();}">
         </div>
         <div class="flex-gap">
           <button class="btn btn-primary" onclick="addTask()">Hinzufügen</button>
@@ -1288,20 +1290,34 @@ function showSaveError() {
   setTimeout(() => { t.classList.add('hidden'); saveErrorShown = false; }, 5000);
 }
 
+function saveNow() {
+  try { localStorage.setItem('passerelle_v1', JSON.stringify(state)); }
+  catch (e) { console.warn('Speichern fehlgeschlagen:', e); showSaveError(); }
+}
 function save() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { localStorage.setItem('passerelle_v1', JSON.stringify(state)); }
-    catch (e) { console.warn('Speichern fehlgeschlagen:', e); showSaveError(); }
-  }, 500);
+  saveTimer = setTimeout(saveNow, 500);
 }
+// Bug #6: Debounce-Flush bei Tab-Schluss
+window.addEventListener('beforeunload', () => { clearTimeout(saveTimer); saveNow(); });
 
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem('passerelle_v1');
     if (!raw) return;
     const parsed = JSON.parse(raw);
-    state = Object.assign({}, state, parsed);
+    // Bug #2: Null-sichere Array-Felder
+    state.tasks    = Array.isArray(parsed.tasks)    ? parsed.tasks    : state.tasks;
+    state.sessions = Array.isArray(parsed.sessions) ? parsed.sessions : state.sessions;
+    state.journal  = Array.isArray(parsed.journal)  ? parsed.journal  : state.journal;
+    state.reviews  = Array.isArray(parsed.reviews)  ? parsed.reviews  : state.reviews;
+    // Bug #4: Deep-merge settings, nicht shallow-overwrite
+    if (parsed.settings && typeof parsed.settings === 'object' && parsed.settings !== null) {
+      state.settings = { ...state.settings, ...parsed.settings };
+    }
+    if (parsed.triage  && typeof parsed.triage  === 'object' && parsed.triage  !== null) state.triage  = parsed.triage;
+    if (parsed.weekPlan && typeof parsed.weekPlan === 'object' && parsed.weekPlan !== null) state.weekPlan = parsed.weekPlan;
+    if (typeof parsed.motIndex === 'number') state.motIndex = parsed.motIndex;
     // Fehlende Fächer aus Default ergänzen
     Object.keys(defaultTriage).forEach(s => {
       if (!state.triage[s]) state.triage[s] = JSON.parse(JSON.stringify(defaultTriage[s]));
@@ -1332,14 +1348,24 @@ function importData(ev) {
       // Pomodoro stoppen bevor state ersetzt wird
       pausePom();
       // Nur bekannte Felder übernehmen, fehlende mit Defaults auffüllen
+      // Bug #1: null-Check für triage (typeof null === 'object')
+      // Bug #4: Deep-merge settings
+      // Bug #10: Tasks mit Feld-Defaults normalisieren
+      const normTask = t => ({
+        id: t.id || uid(), subject: t.subject || '', topic: t.topic || '',
+        pomodoros: typeof t.pomodoros === 'number' ? t.pomodoros : 2,
+        completed: !!t.completed, date: t.date || todayISO(),
+      });
       state = {
-        tasks:    Array.isArray(parsed.tasks)    ? parsed.tasks    : state.tasks,
-        triage:   parsed.triage   && typeof parsed.triage   === 'object' ? parsed.triage   : state.triage,
-        weekPlan: parsed.weekPlan && typeof parsed.weekPlan === 'object' ? parsed.weekPlan : state.weekPlan,
+        tasks:    Array.isArray(parsed.tasks)    ? parsed.tasks.map(normTask) : state.tasks,
+        triage:   parsed.triage   && typeof parsed.triage   === 'object' && parsed.triage   !== null ? parsed.triage   : state.triage,
+        weekPlan: parsed.weekPlan && typeof parsed.weekPlan === 'object' && parsed.weekPlan !== null ? parsed.weekPlan : state.weekPlan,
         sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
         journal:  Array.isArray(parsed.journal)  ? parsed.journal  : [],
         reviews:  Array.isArray(parsed.reviews)  ? parsed.reviews  : [],
-        settings: parsed.settings && typeof parsed.settings === 'object' ? parsed.settings : state.settings,
+        settings: parsed.settings && typeof parsed.settings === 'object' && parsed.settings !== null
+                  ? { ...state.settings, ...parsed.settings }
+                  : state.settings,
         motIndex: typeof parsed.motIndex === 'number' ? parsed.motIndex : 0,
       };
       // Fehlende Fächer aus Default ergänzen
@@ -1413,23 +1439,28 @@ function renderTasks() {
     return;
   }
 
-  el.innerHTML = tasks.map(t => `
-    <div class="task-item ${t.completed ? 'completed' : ''}">
+  // Bug #7: completed (boolean) und level direkt als sichere Strings übergeben
+  el.innerHTML = tasks.map(t => {
+    const done = t.completed ? 'true' : 'false';
+    const doneClass = t.completed ? 'completed' : '';
+    const poms = Math.min(Number(t.pomodoros) || 2, 10);
+    return `
+    <div class="task-item ${doneClass}">
       <div class="task-check" onclick="toggleTask('${t.id}')" role="checkbox"
-           aria-checked="${t.completed}" tabindex="0"
+           aria-checked="${done}" tabindex="0"
            onkeydown="if(event.key==='Enter'||event.key===' ')toggleTask('${t.id}')">
         ${t.completed ? '✓' : ''}
       </div>
       <div class="task-body">
         <div class="task-subject">${esc(t.subject)}</div>
         <div class="task-topic">${esc(t.topic)}</div>
-        <div class="task-pomodoros">${'🍅'.repeat(Math.min(t.pomodoros, 10))} ${t.pomodoros} Pomodoro${t.pomodoros !== 1 ? 's' : ''}</div>
+        <div class="task-pomodoros">${'🍅'.repeat(poms)} ${poms} Pomodoro${poms !== 1 ? 's' : ''}</div>
       </div>
       <div class="task-actions">
         <button class="btn btn-icon btn-sm" onclick="deleteTask('${t.id}')" aria-label="Aufgabe löschen" title="Löschen">✕</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleTask(id) {
@@ -1573,17 +1604,20 @@ function countWeekSessions() {
 }
 
 function logSession() {
-  state.sessions.push({ id: uid(), date: todayISO(), ts: new Date().toISOString(), dur: state.settings.pomDur });
+  // Bug #8: tatsächlich vergangene Zeit loggen (pom.total), nicht die aktuelle Einstellung
+  const dur = pom.total > 0 ? Math.round(pom.total / 60) : state.settings.pomDur;
+  state.sessions.push({ id: uid(), date: todayISO(), ts: new Date().toISOString(), dur });
   save();
 }
 
 function onPomDurationChange() {
-  state.settings.pomDur = parseInt(document.getElementById('pomDuration').value);
-  save(); if (!pom.running) resetPomodoro();
+  // Bug #5: parseInt-Fallback gegen NaN
+  const v = parseInt(document.getElementById('pomDuration').value);
+  if (!isNaN(v) && v > 0) { state.settings.pomDur = v; save(); if (!pom.running) resetPomodoro(); }
 }
 function onPomBreakChange() {
-  state.settings.pomBreak = parseInt(document.getElementById('pomBreakDur').value);
-  save();
+  const v = parseInt(document.getElementById('pomBreakDur').value);
+  if (!isNaN(v) && v > 0) { state.settings.pomBreak = v; save(); }
 }
 function togglePomSettings() {
   document.getElementById('pomSettingsPanel').classList.toggle('hidden');
@@ -1700,31 +1734,45 @@ function renderTopics() {
     el.innerHTML = '<p class="text-light text-sm">Noch keine Themen. Klicke «+ Thema».</p>';
     return;
   }
-  el.innerHTML = topics.map(t => `
+  // Bug #7: t.level als CSS-Klasse sanitizen — nur erlaubte Werte durchlassen
+  const safeLevel = l => ['A','B','C','X'].includes(l) ? l : 'B';
+  const safeStatus = s => [0,1,2,3].includes(s) ? s : 0;
+  el.innerHTML = topics.map(t => {
+    const lvl = safeLevel(t.level);
+    const st  = safeStatus(t.status);
+    return `
     <div class="topic-item">
-      <div class="topic-level level-${t.level}"
+      <div class="topic-level level-${lvl}"
            onclick="cycleLevel('${t.id}')" role="button" tabindex="0"
            title="Stufe ändern: A → B → C → X"
-           onkeydown="if(event.key==='Enter')cycleLevel('${t.id}')">${t.level}</div>
+           onkeydown="if(event.key==='Enter')cycleLevel('${t.id}')">${lvl}</div>
       <div class="topic-name">${esc(t.name)}</div>
-      <div class="topic-status ${statusCls[t.status]}"
+      <div class="topic-status ${statusCls[st]}"
            onclick="cycleStatus('${t.id}')" role="button" tabindex="0"
-           title="Status ändern" aria-label="Status: ${statusLabels[t.status]}"
-           onkeydown="if(event.key==='Enter')cycleStatus('${t.id}')">${statusLabels[t.status]}</div>
+           title="Status ändern" aria-label="Status: ${statusLabels[st]}"
+           onkeydown="if(event.key==='Enter')cycleStatus('${t.id}')">${statusLabels[st]}</div>
       <button class="btn btn-icon btn-sm" onclick="deleteTopic('${t.id}')" aria-label="Thema löschen">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function cycleLevel(id) {
-  const t = state.triage[currentSubject].find(x => x.id === id);
+  // Bug #3: Guard falls Subject nicht existiert; Bug #9: indexOf-1 Fallback
+  const topics = state.triage[currentSubject];
+  if (!Array.isArray(topics)) return;
+  const t = topics.find(x => x.id === id);
   if (t) {
-    t.level = levelOrder[(levelOrder.indexOf(t.level) + 1) % levelOrder.length];
+    const idx = levelOrder.indexOf(t.level);
+    t.level = levelOrder[idx >= 0 ? (idx + 1) % levelOrder.length : 0];
     save(); renderTopics(); renderProgressBars();
   }
 }
 
 function cycleStatus(id) {
-  const t = state.triage[currentSubject].find(x => x.id === id);
+  // Bug #3: Guard
+  const topics = state.triage[currentSubject];
+  if (!Array.isArray(topics)) return;
+  const t = topics.find(x => x.id === id);
   if (t) {
     t.status = (t.status + 1) % 4;
     if (t.status >= 2) t.lastReview = todayISO();
@@ -1733,6 +1781,8 @@ function cycleStatus(id) {
 }
 
 function deleteTopic(id) {
+  // Bug #3: Guard
+  if (!Array.isArray(state.triage[currentSubject])) return;
   state.triage[currentSubject] = state.triage[currentSubject].filter(x => x.id !== id);
   save(); renderTopics(); renderProgressBars();
 }
