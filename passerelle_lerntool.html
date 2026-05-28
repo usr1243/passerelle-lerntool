@@ -1012,6 +1012,26 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .gl-credits { text-align: center; padding: 1.25rem; background: var(--bg-subtle); border-radius: var(--radius); font-size: 0.79rem; color: var(--text-xlight); line-height: 1.75; border: 1px solid var(--border); }
     .gl-credits strong { color: var(--text-light); display: block; margin-bottom: 0.25rem; }
 
+    /* === RESSOURCEN-KARTEN === */
+    .resource-link-card {
+      display: flex; align-items: flex-start; gap: 0.85rem;
+      padding: 1rem; border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      text-decoration: none; color: inherit;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+    .resource-link-card:hover { border-color: var(--blue); box-shadow: 0 2px 12px rgba(91,124,153,0.12); }
+    .resource-link-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .resource-link-body { flex: 1; min-width: 0; }
+    .resource-link-title { font-weight: 700; font-size: 0.9rem; color: var(--blue); margin-bottom: 0.3rem; }
+    .resource-link-desc { font-size: 0.82rem; line-height: 1.6; color: var(--text-light); margin-bottom: 0.5rem; }
+    .resource-link-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .resource-tag { font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--blue-light); color: var(--blue); }
+    .resource-link-arrow { font-size: 1rem; color: var(--blue); flex-shrink: 0; margin-top: 3px; opacity: 0.5; }
+
     /* ============================================================
        RESPONSIVE
        ============================================================ */
@@ -1036,6 +1056,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
   <div class="header-top">
     <span class="app-title">Passerelle Lerntool</span>
     <div class="header-actions">
+      <button class="btn btn-icon btn-sm" onclick="switchTab('grundlage'); setTimeout(()=>document.getElementById('ressourcen-card').scrollIntoView({behavior:'smooth'}),150)" aria-label="Ressourcen und Links">🔗 Ressourcen</button>
       <button class="btn btn-icon btn-sm" onclick="exportData()" aria-label="Daten als JSON exportieren">⬇ Export</button>
       <button class="btn btn-icon btn-sm" onclick="document.getElementById('importFile').click()" aria-label="Daten importieren">⬆ Import</button>
       <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
@@ -1601,6 +1622,49 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div class="gl-technique te">
         <div class="gl-technique-body">Stoff komplett auf Stufe A reduzieren · nur noch alte Prüfungen lösen (eine pro Fach pro Woche) · Mathematik und Naturwissenschaften priorisieren · 2 Tage vor jeder Prüfung aufhören zu lernen — schlafen, spazieren, essen.</div>
       </div>
+    </div>
+
+    <!-- Ressourcen & Community -->
+    <div class="card gl-section" id="ressourcen-card">
+      <div class="gl-label">Ressourcen &amp; Community</div>
+      <div class="gl-h2">Dieses Tool + diese Seiten = ultimative Vorbereitung</div>
+      <p class="gl-p">Das Tool hilft dir mit Struktur, Priorisierung und Psychologie. Aber für den eigentlichen Stoff — alte Prüfungen, Anki-Karten, Erfahrungsberichte — sind diese beiden Seiten unersetzlich. Beide wurden von echten Passerelle-Absolventinnen und -Absolventen aufgebaut.</p>
+
+      <!-- swisspasserelle.wordpress.com -->
+      <a href="https://swisspasserelle.wordpress.com" target="_blank" rel="noopener" class="resource-link-card">
+        <div class="resource-link-icon">📝</div>
+        <div class="resource-link-body">
+          <div class="resource-link-title">swisspasserelle.wordpress.com</div>
+          <div class="resource-link-desc">Von einer Passerelle-Absolventin geführter Blog mit echten Erfahrungsberichten, Prüfungslösungen (Mathe 2019–2021), Anki-Karten für Bio/Geo/Geschichte, einem Secondhand-Lehrmittelmarkt und praktischen Tipps zur mündlichen Prüfung. Authentisch, peer-to-peer, auf dem neusten Stand.</div>
+          <div class="resource-link-tags">
+            <span class="resource-tag">Prüfungslösungen</span>
+            <span class="resource-tag">Anki-Karten</span>
+            <span class="resource-tag">Erfahrungsberichte</span>
+            <span class="resource-tag">Lehrmittel-Markt</span>
+          </div>
+        </div>
+        <div class="resource-link-arrow">→</div>
+      </a>
+
+      <!-- passerelle-bestehen.ch -->
+      <a href="https://passerelle-bestehen.ch/wichtige-links" target="_blank" rel="noopener" class="resource-link-card">
+        <div class="resource-link-icon">🔗</div>
+        <div class="resource-link-body">
+          <div class="resource-link-title">passerelle-bestehen.ch — Wichtige Links</div>
+          <div class="resource-link-desc">Die umfassendste Link-Sammlung zur Passerelle: offizielle SBFI-Seite mit Richtlinien und Prüfungsdaten, Lernpartner-Vermittlung, Archiv alter Prüfungen (auf Anfrage), drei YouTube-Serien zur Prüfungsvorbereitung und ein Forum für Fragen. Idealer Einstieg wenn du weisst, was du suchst.</div>
+          <div class="resource-link-tags">
+            <span class="resource-tag">SBFI-Richtlinien</span>
+            <span class="resource-tag">Alte Prüfungen</span>
+            <span class="resource-tag">Lernpartner finden</span>
+            <span class="resource-tag">YouTube-Tipps</span>
+          </div>
+        </div>
+        <div class="resource-link-arrow">→</div>
+      </a>
+
+      <p class="gl-p" style="margin-top:0.75rem; font-size:0.82rem;">
+        <strong>Empfohlener Ablauf:</strong> Dieses Tool täglich nutzen für Struktur und Überblick → passerelle-bestehen.ch für offizielle Richtlinien und Prüfungsarchiv → swisspasserelle.wordpress.com für Lösungen, Karten und echte Tipps von Absolventinnen.
+      </p>
     </div>
 
     <!-- Credits -->
