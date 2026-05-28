@@ -1031,6 +1031,12 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .resource-link-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
     .resource-tag { font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--blue-light); color: var(--blue); }
     .resource-link-arrow { font-size: 1rem; color: var(--blue); flex-shrink: 0; margin-top: 3px; opacity: 0.5; }
+    .offline-option { display: flex; gap: 0.85rem; margin-bottom: 1rem; align-items: flex-start; }
+    .offline-option-num { width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: #fff; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .offline-option-body { flex: 1; }
+    .offline-option-title { font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 0.3rem; }
+    .offline-option-desc { font-size: 0.83rem; line-height: 1.65; color: var(--text-light); margin-bottom: 0.5rem; }
+    .offline-option-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 
     /* ============================================================
        RESPONSIVE
@@ -1667,6 +1673,61 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       </p>
     </div>
 
+    <!-- Offline & App -->
+    <div class="card gl-section">
+      <div class="gl-label">Offline &amp; App-Modus</div>
+      <div class="gl-h2">Das Tool immer dabei — auch ohne Internet</div>
+      <p class="gl-p">Es gibt zwei Wege, das Tool lokal zu speichern, damit es unabhängig von der Internetverbindung und von GitHub funktioniert:</p>
+
+      <div class="offline-option">
+        <div class="offline-option-num">1</div>
+        <div class="offline-option-body">
+          <div class="offline-option-title">Als App auf iPhone / iPad installieren</div>
+          <div class="offline-option-desc">In Safari öffnen → Teilen-Symbol antippen (Quadrat mit Pfeil) → «Zum Home-Bildschirm» → Hinzufügen. Die App öffnet sich danach ohne Browser-Leiste, wie eine native App. Alle Daten bleiben separat von Safari gespeichert und werden beim Verlauf-Löschen nicht berührt.</div>
+          <div class="offline-option-tags">
+            <span class="resource-tag">iOS Safari</span>
+            <span class="resource-tag">Eigene App-Sandbox</span>
+            <span class="resource-tag">Kein Internet nötig</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="offline-option">
+        <div class="offline-option-num">2</div>
+        <div class="offline-option-body">
+          <div class="offline-option-title">HTML-Datei herunterladen &amp; lokal speichern</div>
+          <div class="offline-option-desc">Die gesamte App ist eine einzige HTML-Datei. Herunterladen, auf dem Desktop oder in iCloud speichern, und per Doppelklick in jedem Browser öffnen — komplett ohne Internet, ohne Account, ohne Installation. Alle Daten bleiben im Browser-Speicher des Geräts.</div>
+          <div class="offline-option-tags">
+            <span class="resource-tag">Mac / Windows / iPad</span>
+            <span class="resource-tag">Kein Account</span>
+            <span class="resource-tag">Einzelne Datei</span>
+          </div>
+          <button class="btn btn-primary" style="margin-top:0.75rem;" onclick="downloadApp()">⬇ HTML-Datei herunterladen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kontakt -->
+    <div class="card gl-section">
+      <div class="gl-label">Kontakt</div>
+      <div class="gl-h2">Feedback, Ideen, Fragen?</div>
+      <p class="gl-p">Dieses Tool ist kostenlos und wird laufend verbessert. Wenn du Feedback hast, etwas nicht funktioniert, du ein Feature vermisst — oder wenn du das Tool auf deiner Webseite einbetten möchtest — schreib einfach eine Mail.</p>
+      <a href="mailto:rambog342@gmail.com?subject=Passerelle Lerntool – Feedback" class="resource-link-card" style="margin-bottom:0;">
+        <div class="resource-link-icon">✉️</div>
+        <div class="resource-link-body">
+          <div class="resource-link-title">rambog342@gmail.com</div>
+          <div class="resource-link-desc">Direkter Kontakt zur Person, die dieses Tool entwickelt hat. Schreib auf Deutsch oder Englisch, wie es dir am besten passt.</div>
+          <div class="resource-link-tags">
+            <span class="resource-tag">Feedback</span>
+            <span class="resource-tag">Feature-Ideen</span>
+            <span class="resource-tag">Einbetten / Teilen</span>
+            <span class="resource-tag">Bug melden</span>
+          </div>
+        </div>
+        <div class="resource-link-arrow">→</div>
+      </a>
+    </div>
+
     <!-- Credits -->
     <div class="gl-credits">
       <strong>Über dieses Tool</strong>
@@ -2103,6 +2164,19 @@ function toggleRef(id) {
   const card = document.getElementById(id);
   if (!card) return;
   card.classList.toggle('hidden');
+}
+
+function downloadApp() {
+  const link = document.createElement('a');
+  // Wenn online auf GitHub Pages: relative URL zur aktuellen HTML-Datei
+  // Wenn bereits lokal: aktuelle Datei herunterladen
+  link.href = window.location.protocol === 'file:'
+    ? window.location.href
+    : 'passerelle_lerntool.html';
+  link.download = 'passerelle_lerntool.html';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 // ============================================================
