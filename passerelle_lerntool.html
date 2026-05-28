@@ -2915,6 +2915,31 @@ function renderAll() {
 loadFromStorage();
 renderAll();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
+
+// ============================================================
+// SERVICE WORKER – App lokal speichern (offline-fähig)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./passerelle-sw.js')
+      .then((reg) => {
+        // Im Hintergrund prüfen ob neue Version verfügbar
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Neue Version verfügbar – beim nächsten Öffnen aktiv
+              console.log('Passerelle Lerntool: neue Version gespeichert.');
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        // Kein Service Worker möglich (z.B. privater Modus) – kein Problem
+        console.log('Service Worker nicht verfügbar:', err);
+      });
+  });
+}
 </script>
 </body>
 </html>
