@@ -932,6 +932,68 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .worst-case-a.good { color: var(--green); font-weight: 600; }
 
     /* ============================================================
+       FORSCHUNGS-REFERENZ BADGES
+       ============================================================ */
+    .feature-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+    .feature-header .card-title { margin-bottom: 0; }
+    .ref-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 0.67rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 3px 9px; border-radius: 99px;
+      background: var(--blue-light); color: var(--blue);
+      border: 1px solid var(--blue-mid); cursor: pointer;
+      font-family: var(--font-sans); flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .ref-badge:hover { background: var(--blue-mid); }
+    .ref-card {
+      background: var(--blue-light); border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; margin: 0.6rem 0 1rem;
+    }
+    .ref-section-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--blue); margin-bottom: 0.35rem; }
+    .ref-quote { font-style: italic; color: var(--text-light); font-size: 0.84rem; line-height: 1.65; margin: 0 0 0.45rem; }
+    .ref-link-btn { font-size: 0.76rem; color: var(--blue); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; font-family: var(--font-sans); }
+
+    /* ============================================================
+       GRUNDLAGE TAB
+       ============================================================ */
+    .gl-hero { background: linear-gradient(135deg, var(--blue-light) 0%, var(--bg) 100%); border: 1px solid var(--blue-mid); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .gl-hero-title { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; line-height: 1.3; }
+    .gl-hero-sub { font-size: 0.88rem; color: var(--text-light); line-height: 1.65; margin-bottom: 0.75rem; }
+    .gl-stat-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .gl-stat { display: inline-flex; align-items: center; background: var(--blue); color: #fff; padding: 4px 12px; border-radius: 99px; font-size: 0.76rem; font-weight: 700; font-family: var(--font-sans); }
+    .gl-section { margin-bottom: 0; }
+    .gl-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 0.4rem; }
+    .gl-h2 { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0 0 0.75rem; }
+    .gl-h3 { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 1rem 0 0.35rem; }
+    .gl-p { font-size: 0.87rem; line-height: 1.7; color: var(--text-light); margin: 0 0 0.65rem; }
+    .gl-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 0.6rem 0 1rem; }
+    .gl-table th { background: var(--bg-subtle); color: var(--text); font-weight: 700; padding: 0.45rem 0.65rem; text-align: left; border-bottom: 2px solid var(--blue-mid); }
+    .gl-table td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--bg-subtle); color: var(--text-light); vertical-align: top; }
+    .gl-table tr:last-child td { border-bottom: none; }
+    .gl-quote-block { border-left: 3px solid var(--blue-mid); padding: 0.55rem 0.85rem; margin: 0.4rem 0 0.85rem; background: var(--bg-subtle); border-radius: 0 8px 8px 0; }
+    .gl-quote-block p { font-style: italic; color: var(--text-light); font-size: 0.85rem; line-height: 1.65; margin: 0 0 0.2rem; }
+    .gl-quote-block cite { font-size: 0.73rem; color: var(--text-xlight); font-style: normal; }
+    .gl-step { display: flex; gap: 0.7rem; margin-bottom: 0.7rem; align-items: flex-start; }
+    .gl-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .gl-step-body { font-size: 0.87rem; line-height: 1.65; color: var(--text-light); }
+    .gl-step-body strong { color: var(--text); }
+    .gl-pill { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 0.72rem; font-weight: 700; margin-right: 2px; }
+    .gl-pill-a { background: var(--green-light); color: var(--green); }
+    .gl-pill-b { background: var(--yellow-light); color: var(--yellow); }
+    .gl-pill-c { background: var(--bg-subtle); color: var(--text-light); border: 1px solid var(--border); }
+    .gl-pill-x { background: var(--terracotta-light); color: var(--terracotta); }
+    .gl-technique { background: var(--bg-subtle); border-radius: var(--radius); padding: 0.75rem 1rem; margin-bottom: 0.55rem; border-left: 3px solid transparent; }
+    .gl-technique.gr { border-left-color: var(--green); }
+    .gl-technique.bl { border-left-color: var(--blue); }
+    .gl-technique.te { border-left-color: var(--terracotta); }
+    .gl-technique-title { font-weight: 700; font-size: 0.88rem; color: var(--text); margin-bottom: 0.25rem; }
+    .gl-technique-body { font-size: 0.83rem; line-height: 1.65; color: var(--text-light); }
+    .gl-credits { text-align: center; padding: 1.25rem; background: var(--bg-subtle); border-radius: var(--radius); font-size: 0.79rem; color: var(--text-xlight); line-height: 1.75; border: 1px solid var(--border); }
+    .gl-credits strong { color: var(--text-light); display: block; margin-bottom: 0.25rem; }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 520px) {
@@ -963,7 +1025,8 @@ Inhalte anpassen (ohne Programmierkenntnisse):
   <nav class="nav-tabs" role="tablist" aria-label="Hauptnavigation">
     <button class="nav-tab active" role="tab" aria-selected="true"  onclick="switchTab('heute')">Heute</button>
     <button class="nav-tab"        role="tab" aria-selected="false" onclick="switchTab('stoff')">Stoff</button>
-    <button class="nav-tab"        role="tab" aria-selected="false" onclick="switchTab('plan')">Plan & Rückblick</button>
+    <button class="nav-tab"        role="tab" aria-selected="false" onclick="switchTab('plan')">Plan</button>
+    <button class="nav-tab"        role="tab" aria-selected="false" onclick="switchTab('grundlage')">📖 Grundlage</button>
   </nav>
 </header>
 
@@ -982,7 +1045,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <!-- Prüfungs-Countdown -->
     <div class="countdown-card" id="countdownCard">
       <div class="countdown-left">
-        <div class="countdown-label">⏳ Bis zur Passerelle-Prüfung</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+          <div class="countdown-label" style="margin-bottom:0;">⏳ Bis zur Passerelle-Prüfung</div>
+          <button class="ref-badge" onclick="toggleRef('ref-countdown')" aria-label="Forschungsgrundlage">📖 A1</button>
+        </div>
+        <div class="ref-card hidden" id="ref-countdown">
+          <div class="ref-section-label">Abschnitt A1 — 48h-Sofortmassnahmen</div>
+          <p class="ref-quote">«Drei Spalten: Fächer · Selbsteinschätzung 1–5 · Datum der nächsten Prüfung / des nächsten Tests in diesem Fach. Dieses Blatt ist deine Karte. Solange sie nicht existiert, ist jede Lernsekunde Bauchgefühl.»</p>
+          <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+        </div>
         <div class="countdown-days" id="countdownDays">– – –</div>
         <div class="countdown-sub" id="countdownSub">Prüfungsdatum rechts eintragen →</div>
       </div>
@@ -992,16 +1063,33 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       </div>
     </div>
 
-    <div class="motivation-box" id="motivationBox"
-         onclick="nextMotivation()" role="button" tabindex="0"
-         aria-label="Motivationssatz – klicken für neuen Satz"
-         onkeydown="if(event.key==='Enter'||event.key===' ')nextMotivation()">
-      <span id="motivationText">...</span><span class="motivation-hint">Klicken für neuen Satz</span>
+    <div style="position:relative;">
+      <div class="motivation-box" id="motivationBox"
+           onclick="nextMotivation()" role="button" tabindex="0"
+           aria-label="Motivationssatz – klicken für neuen Satz"
+           onkeydown="if(event.key==='Enter'||event.key===' ')nextMotivation()">
+        <span id="motivationText">...</span><span class="motivation-hint">Klicken für neuen Satz</span>
+      </div>
+      <button class="ref-badge" onclick="toggleRef('ref-motivation')" aria-label="Forschungsgrundlage"
+              style="position:absolute;top:0.65rem;right:0.75rem;">📖 C1</button>
+    </div>
+    <div class="ref-card hidden" id="ref-motivation" style="margin-top:-0.5rem;margin-bottom:1rem;">
+      <div class="ref-section-label">Abschnitt C1 — Psychologie & Motivation</div>
+      <p class="ref-quote">«Der Ausstieg beginnt mit einer winzigen, sichtbar abgeschlossenen Handlung. Eine Karteikarte. Ein Pomodoro. Ein Abschnitt. Erst danach kommt die Motivation — nicht umgekehrt.»</p>
+      <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
     </div>
 
     <!-- Diese Woche – Statistik -->
     <div class="card">
-      <div class="card-title">Diese Woche</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Diese Woche</div>
+        <button class="ref-badge" onclick="toggleRef('ref-stats')" aria-label="Forschungsgrundlage">📖 C1</button>
+      </div>
+      <div class="ref-card hidden" id="ref-stats">
+        <div class="ref-section-label">Abschnitt C1 — Psychologie & Motivation</div>
+        <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die Hilflosigkeit. Eine Striche-Liste, ein abgehakter Tagesplan, eine Prozent-Anzeige am gelernten Stoff. Deshalb braucht das Tool eine prominente Fortschrittsanzeige.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div class="stats-row">
         <div class="stat-item">
           <span class="stat-value" id="statWeekPom">0</span>
@@ -1020,9 +1108,17 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Heutige Aufgaben -->
     <div class="card">
-      <div class="flex-between" style="margin-bottom:1rem;">
+      <div class="flex-between" style="margin-bottom:0.5rem;">
         <div class="card-title" style="margin-bottom:0;">Heutige Aufgaben</div>
-        <button class="btn btn-outline btn-sm" onclick="toggleAddTask()">+ Aufgabe</button>
+        <div style="display:flex;gap:0.4rem;align-items:center;">
+          <button class="ref-badge" onclick="toggleRef('ref-tasks')" aria-label="Forschungsgrundlage">📖 A6</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleAddTask()">+ Aufgabe</button>
+        </div>
+      </div>
+      <div class="ref-card hidden" id="ref-tasks">
+        <div class="ref-section-label">Abschnitt A6 — 48h-Sofortmassnahmen</div>
+        <p class="ref-quote">«Eine «Heute-Karte» bauen. Maximal 3 Aufgaben pro Tag, jeweils mit Zeit (z.B. «Bio: Zellatmung Skript S. 12–18 lesen + 5 Karteikarten, 60 Min.»). Mehr ist Selbstbetrug.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
       </div>
       <div id="taskList"></div>
       <div class="add-task-form hidden" id="addTaskForm">
@@ -1057,7 +1153,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Pomodoro-Timer -->
     <div class="card" id="pomCard">
-      <div class="card-title">Pomodoro-Timer</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Pomodoro-Timer</div>
+        <button class="ref-badge" onclick="toggleRef('ref-pomodoro')" aria-label="Forschungsgrundlage">📖 B3</button>
+      </div>
+      <div class="ref-card hidden" id="ref-pomodoro">
+        <div class="ref-section-label">Abschnitt B3 — Wochentemplate & Lernrhythmus</div>
+        <p class="ref-quote">«Rhythmus innerhalb eines Blocks (90 Min.): 25 Min. lernen – 5 Min. Pause – 25 Min. lernen – 5 Min. Pause – 25 Min. lernen – 5 Min. echte Pause (Bewegung, Wasser, Fenster auf). Das ist die Standard-Pomodoro-Variante, anwendbar ab dem ersten Tag.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div class="pomodoro-container">
         <!-- SVG-Ring -->
         <div class="pom-ring-wrap" aria-hidden="true">
@@ -1105,13 +1209,29 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Fortschritt je Fach -->
     <div class="card">
-      <div class="card-title">Fortschritt je Fach (Pflicht-Themen)</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Fortschritt je Fach (Pflicht-Themen)</div>
+        <button class="ref-badge" onclick="toggleRef('ref-progress')" aria-label="Forschungsgrundlage">📖 C1</button>
+      </div>
+      <div class="ref-card hidden" id="ref-progress">
+        <div class="ref-section-label">Abschnitt C1 — Warum Fortschrittsanzeige?</div>
+        <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die erlernte Hilflosigkeit. Pro Fach ein Balken mit dem Anteil A-Themen die auf «kann ich» oder höher stehen. Kein Vergleich mit einem theoretischen Maximum (das demoralisiert) — nur die eigene Entwicklung.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div id="progressBars"></div>
     </div>
 
     <!-- Mini-Erfolge -->
     <div class="card">
-      <div class="card-title">Mini-Erfolge heute</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Mini-Erfolge heute</div>
+        <button class="ref-badge" onclick="toggleRef('ref-journal')" aria-label="Forschungsgrundlage">📖 C4</button>
+      </div>
+      <div class="ref-card hidden" id="ref-journal">
+        <div class="ref-section-label">Abschnitt C4 — Wie man trotz Rückstand Boden gewinnt</div>
+        <p class="ref-quote">«Tägliche Mikro-Erfolge dokumentieren. Ein Notizbuch oder das HTML-Tool: jeden Abend drei Zeilen «Heute gelernt: …». Nach zwei Wochen sichtbare Beweise gegen das Gefühl der Stagnation.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div style="display:grid; gap:0.5rem; margin-bottom:0.75rem;">
         <textarea id="journalToday" placeholder="Was habe ich heute gelernt? Drei Sätze reichen." rows="3"
                   aria-label="Heutiger Lernrückblick"></textarea>
@@ -1128,7 +1248,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
   <div id="panel-stoff" class="panel" role="tabpanel">
 
     <div class="card" style="margin-bottom:1rem;">
-      <div class="card-title">Stoff-Triage</div>
+      <div class="feature-header" style="margin-bottom:0.75rem;">
+        <div class="card-title" style="margin-bottom:0;">Stoff-Triage</div>
+        <button class="ref-badge" onclick="toggleRef('ref-triage')" aria-label="Forschungsgrundlage">📖 B1</button>
+      </div>
+      <div class="ref-card hidden" id="ref-triage">
+        <div class="ref-section-label">Abschnitt B1 — Triage-Matrix</div>
+        <p class="ref-quote">«Stufe A (Pflicht): In SBFI-Richtlinien explizit genannt + in mind. 2 der letzten 4 Prüfungen vorgekommen → 60% Lernzeit. Stufe B (Wichtig): In Richtlinien genannt, aber nicht jährlich geprüft → 30%. Stufe C (Optional): Im Lehrmittel, aber nicht in Richtlinien → 10%. X (Streichen): Im Lehrmittel UND nicht in Richtlinien UND nicht in alten Prüfungen → 0%.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.7;">
         <strong style="color:var(--green);">A</strong> = Pflicht (SBFI + alte Prüfungen) &nbsp;·&nbsp;
         <strong style="color:var(--yellow);">B</strong> = Wichtig &nbsp;·&nbsp;
@@ -1157,7 +1285,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Cluster-Notentracker -->
     <div class="card">
-      <div class="card-title">Wo stehe ich? — Cluster-Übersicht</div>
+      <div class="feature-header" style="margin-bottom:0.75rem;">
+        <div class="card-title" style="margin-bottom:0;">Wo stehe ich? — Cluster-Übersicht</div>
+        <button class="ref-badge" onclick="toggleRef('ref-cluster')" aria-label="Forschungsgrundlage">📖 B1</button>
+      </div>
+      <div class="ref-card hidden" id="ref-cluster">
+        <div class="ref-section-label">Abschnitt B1 — Triage & Cluster</div>
+        <p class="ref-quote">«Regel 1: Mathematik und die Naturwissenschaften entscheiden die Prüfung. Wörtlich SBFI: «Die Erfahrung zeigt, dass oft die Fächer Mathematik und Naturwissenschaften über den Prüfungserfolg entscheiden.» Diese Fächer brauchen 35–45% deiner Selbststudium-Zeit.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.7;">
         Die Passerelle bewertet in <strong>5 Gruppen</strong> (Cluster). Du brauchst einen Schnitt von mindestens 4.0, maximal 2 Noten unter 4.0 und keine Note unter 2.0.<br>
         Trag deine aktuelle Selbsteinschätzung ein (1 = kann ich gar nicht, 6 = sitzt sicher). Das zeigt dir, wo du zuerst ansetzen musst.
@@ -1168,19 +1304,35 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Wochenplan -->
     <div class="card">
-      <div class="flex-between" style="margin-bottom:1rem;">
-        <div class="card-title" style="margin-bottom:0;">Wochenplan</div>
+      <div class="flex-between" style="margin-bottom:0.5rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="card-title" style="margin-bottom:0;">Wochenplan</div>
+          <button class="ref-badge" onclick="toggleRef('ref-weekplan')" aria-label="Forschungsgrundlage">📖 B3</button>
+        </div>
         <div class="flex-gap">
           <button class="btn btn-outline btn-sm" onclick="loadWeekTemplate()">Vorlage laden</button>
           <button class="btn btn-outline btn-sm" onclick="clearWeek()">Leeren</button>
         </div>
+      </div>
+      <div class="ref-card hidden" id="ref-weekplan">
+        <div class="ref-section-label">Abschnitt B3 — Wochentemplate</div>
+        <p class="ref-quote">«Das Schweizer Berufsberatungsportal nennt für Basel ca. 15 Lektionen plus 26 Stunden Selbststudium/Woche. Das ergibt eine 6-Tage-Lernwoche mit einem klaren freien Tag. Pufferzeit ist Pflicht: 10–15% der Wochenstunden bleiben leer.»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
       </div>
       <div class="week-grid" id="weekGrid"></div>
     </div>
 
     <!-- Wochenrückblick -->
     <div class="card">
-      <div class="card-title">Wochenrückblick</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Wochenrückblick</div>
+        <button class="ref-badge" onclick="toggleRef('ref-review')" aria-label="Forschungsgrundlage">📖 D2</button>
+      </div>
+      <div class="ref-card hidden" id="ref-review">
+        <div class="ref-section-label">Abschnitt D2 — Reality-Check alle 2 Wochen</div>
+        <p class="ref-quote">«Schritt 5: Reality-Check alle 2 Wochen. Eine alte Prüfung lösen, ehrlich korrigieren. Das ist Schmerz, aber auch die einzige Wahrheit. Drei Fragen: Was lief gut? Was war schwer? Was ändere ich nächste Woche?»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div class="form-group">
         <label class="form-label" for="reviewGood">Was lief gut diese Woche?</label>
         <textarea id="reviewGood" rows="2" placeholder="Stärken, Erfolge..."></textarea>
@@ -1199,11 +1351,249 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Lern-Protokoll -->
     <div class="card">
-      <div class="card-title">Lern-Protokoll (letzte 7 Tage)</div>
+      <div class="feature-header" style="margin-bottom:1rem;">
+        <div class="card-title" style="margin-bottom:0;">Lern-Protokoll (letzte 7 Tage)</div>
+        <button class="ref-badge" onclick="toggleRef('ref-log')" aria-label="Forschungsgrundlage">📖 B4</button>
+      </div>
+      <div class="ref-card hidden" id="ref-log">
+        <div class="ref-section-label">Abschnitt B4 — Werkzeuge die entscheiden</div>
+        <p class="ref-quote">«Tägliche 20–30 Minuten Karteikarten sind effektiver als 3 Stunden Lesen. Franz (Passerelle 2020 → ETH): «Quizlet hat sich als sehr nützliches Werkzeug bewährt. Mehrmals in der Woche konnte ich so den gelernten Stoff präsent halten und repetieren.»»</p>
+        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      </div>
       <div id="sessionLog"></div>
     </div>
 
   </div>
+
+  <!-- ============================================================
+       PANEL 4: GRUNDLAGE (Passerelle Survival-Kit)
+       ============================================================ -->
+  <div id="panel-grundlage" class="panel" role="tabpanel">
+
+    <!-- Hero -->
+    <div class="gl-hero">
+      <div class="gl-hero-title">Passerelle Survival-Kit — die Forschungsgrundlage dieses Tools</div>
+      <div class="gl-hero-sub">Dieses Tool wurde auf Basis einer umfassenden Recherche entwickelt. Jedes Feature stammt aus konkreten Erkenntnissen darüber, warum Passerelle-Studierende scheitern — und was hilft. Hier findest du die Grundlagen kompakt aufbereitet.</div>
+      <div class="gl-stat-row">
+        <span class="gl-stat">70% Bestehensquote GKG 2022</span>
+        <span class="gl-stat">1 500 Stunden Lernzeit</span>
+        <span class="gl-stat">5 Cluster · 8 Fächer</span>
+      </div>
+    </div>
+
+    <!-- WARUM? -->
+    <div class="card gl-section">
+      <div class="gl-label">Das eigentliche Problem</div>
+      <div class="gl-h2">Nicht Faulheit — Orientierungslosigkeit</div>
+      <p class="gl-p">Die Passerelle Basel verlangt ca. 1 500 Stunden Lernzeit (15 Lektionen Unterricht pro Woche plus rund doppelt so viel Selbststudium). Wer ohne Triage und festen Wochenrhythmus arbeitet, ertrinkt zwangsläufig. Die Bestehensquote 2022 am GKG beträgt exakt 70% (65 von 93 Kandidierenden).</p>
+      <p class="gl-p">Sie wird gewonnen mit drei Hebeln:</p>
+      <div class="gl-step">
+        <div class="gl-step-num">1</div>
+        <div class="gl-step-body"><strong>Ruthlose Priorisierung</strong> nach SBFI-Lernzielen + alte Prüfungen</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">2</div>
+        <div class="gl-step-body"><strong>Feste 90-Minuten-Lernblöcke</strong> statt 8-Stunden-Marathons</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">3</div>
+        <div class="gl-step-body"><strong>Tägliches Mini-Erfolgserlebnis</strong> gegen das «Es-ist-eh-egal»-Gefühl</div>
+      </div>
+    </div>
+
+    <!-- A: SOFORTMASSNAHMEN -->
+    <div class="card gl-section">
+      <div class="gl-label">Abschnitt A — Erste 48 Stunden</div>
+      <div class="gl-h2">Aus der Lähmung herauskommen</div>
+      <p class="gl-p">Nicht das ganze Jahr planen — nur die nächsten 48 Stunden gewinnen.</p>
+
+      <div class="gl-h3">Tag 1 (60–90 Minuten total)</div>
+      <div class="gl-step">
+        <div class="gl-step-num">1</div>
+        <div class="gl-step-body"><strong>Inventur, schriftlich, ein Blatt A4 (max. 20 Min.)</strong> — drei Spalten: Fächer · Selbsteinschätzung 1–5 · Datum der nächsten Prüfung. <em>Dieses Blatt ist deine Karte. Solange sie nicht existiert, ist jede Lernsekunde Bauchgefühl.</em></div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">2</div>
+        <div class="gl-step-body"><strong>SBFI-Richtlinien 2023 herunterladen</strong> — sie sind die einzige verbindliche Inhaltsquelle. Was nicht darin steht, ist Bonus.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">3</div>
+        <div class="gl-step-body"><strong>Alte Prüfungen anfordern</strong> — über das SBFI-Archiv oder passerelle-bestehen.ch nutzen.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">4</div>
+        <div class="gl-step-body"><strong>Eine einzige Lernsession heute. 25 Minuten. Pomodoro.</strong> Egal welches Fach. Ziel: dem Gehirn zeigen, dass Lernen wieder möglich ist.</div>
+      </div>
+
+      <div class="gl-h3">Tag 2 (90 Minuten)</div>
+      <div class="gl-step">
+        <div class="gl-step-num">5</div>
+        <div class="gl-step-body"><strong>Wochenkalender aufmachen.</strong> Zuerst Fixpunkte eintragen: Unterricht, Schlaf (mind. 7h), eine soziale Aktivität, eine Sporteinheit. Diese sind nicht verhandelbar.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">6</div>
+        <div class="gl-step-body"><strong>Eine «Heute-Karte» bauen.</strong> Maximal 3 Aufgaben pro Tag. Mehr ist Selbstbetrug. → <em>Das ist der Ursprung der «Heutige Aufgaben»-Funktion.</em></div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">7</div>
+        <div class="gl-step-body"><strong>Mit einer realen Person Kontakt aufnehmen</strong> — Klassenlehrperson, Mitstudierende oder Coach. Eine Mail mit zwei Sätzen reicht.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">8</div>
+        <div class="gl-step-body"><strong>«Verzichtsliste» schreiben</strong> — drei Dinge, die du in den nächsten 4 Wochen weglässt. Bewusster Verzicht > schlechtes Gewissen.</div>
+      </div>
+    </div>
+
+    <!-- B: LERNSTRATEGIE -->
+    <div class="card gl-section">
+      <div class="gl-label">Abschnitt B — Lernstrategie</div>
+      <div class="gl-h2">Triage: Priorisieren wenn alles wichtig wirkt</div>
+      <p class="gl-p">Die Passerelle prüft fünf Cluster. Das Bestehen verlangt Schnitt ≥ 4.0, maximal 2 Noten unter 4.0, keine Note unter 2.0. <strong>Mathematik und Naturwissenschaften entscheiden die Prüfung</strong> — sie brauchen 35–45% deiner Selbststudium-Zeit.</p>
+
+      <div class="gl-h3">Triage-Matrix (→ Stoff-Tab)</div>
+      <table class="gl-table">
+        <thead><tr><th>Stufe</th><th>Was</th><th>Lernzeit</th></tr></thead>
+        <tbody>
+          <tr><td><span class="gl-pill gl-pill-a">A Pflicht</span></td><td>In SBFI-Richtlinien + mind. 2× in letzten 4 Prüfungen</td><td>60%</td></tr>
+          <tr><td><span class="gl-pill gl-pill-b">B Wichtig</span></td><td>In Richtlinien genannt, aber nicht jährlich geprüft</td><td>30%</td></tr>
+          <tr><td><span class="gl-pill gl-pill-c">C Optional</span></td><td>Im Lehrmittel, aber nicht in den Richtlinien</td><td>10%</td></tr>
+          <tr><td><span class="gl-pill gl-pill-x">X Streichen</span></td><td>Im Lehrmittel UND nicht in Richtlinien UND nicht in alten Prüfungen</td><td>0%</td></tr>
+        </tbody>
+      </table>
+
+      <div class="gl-h3">Wochentemplate (→ Wochenplan-Tab)</div>
+      <table class="gl-table">
+        <thead><tr><th>Tag</th><th>Block 1</th><th>Block 2</th><th>Abend</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Mo</strong></td><td>Präsenz GKG</td><td>90 Min. Recap + HA</td><td>30 Min. Karteikarten</td></tr>
+          <tr><td><strong>Di</strong></td><td>2× 90 Min. Mathematik</td><td>90 Min. Naturwiss.</td><td>30 Min. Englisch</td></tr>
+          <tr><td><strong>Mi</strong></td><td>Präsenz GKG</td><td>90 Min. schwächstes Fach</td><td>frei (sozial/Sport)</td></tr>
+          <tr><td><strong>Do</strong></td><td>Präsenz GKG</td><td>90 Min. Geschichte/Geografie</td><td>30 Min. Karteikarten</td></tr>
+          <tr><td><strong>Fr</strong></td><td>Präsenz GKG</td><td>90 Min. Deutsch + 90 Min. Mathe</td><td>30 Min. Karteikarten</td></tr>
+          <tr><td><strong>Sa</strong></td><td>2× 90 Min. schwächstes Fach</td><td>90 Min. Wochenrückblick</td><td>frei</td></tr>
+          <tr><td><strong>So</strong></td><td colspan="2">komplett frei</td><td>20 Min. Wochenplanung</td></tr>
+        </tbody>
+      </table>
+
+      <div class="gl-h3">Lernblock-Rhythmus (90 Min.)</div>
+      <p class="gl-p">25 Min. lernen – 5 Min. Pause – 25 Min. lernen – 5 Min. Pause – 25 Min. lernen – 5 Min. echte Pause (Bewegung, Wasser, Fenster auf). Das ist der Ursprung des Pomodoro-Timers im Tool.</p>
+
+      <div class="gl-h3">3 bewährte Werkzeuge</div>
+      <div class="gl-technique bl">
+        <div class="gl-technique-title">Karteikarten (Anki / Quizlet)</div>
+        <div class="gl-technique-body">Tägliche 20–30 Minuten Karteikarten sind effektiver als 3 Stunden Lesen. Franz (Passerelle 2020 → ETH): «Quizlet hat sich als sehr nützliches Werkzeug bewährt.»</div>
+      </div>
+      <div class="gl-technique bl">
+        <div class="gl-technique-title">Alte Prüfungen früh lösen</div>
+        <div class="gl-technique-body">Lea (Passerelle 2024): «Löst alte Prüfungen! Das Prüfungsschema ist immer ähnlich — ihr könnt euch daran gewöhnen und häufig auftretende Aufgabentypen erkennen.»</div>
+      </div>
+      <div class="gl-technique bl">
+        <div class="gl-technique-title">YouTube als Erstkontakt</div>
+        <div class="gl-technique-body">«Mathefrosch» (Mathematik), «TheSimpleClub» (Naturwissenschaften), «MrWissen2Go» (Geschichte). Funktion: Themen aus dem Stand zugänglich machen, danach Lehrbuch zur Vertiefung.</div>
+      </div>
+    </div>
+
+    <!-- C: PSYCHOLOGIE -->
+    <div class="card gl-section">
+      <div class="gl-label">Abschnitt C — Psychologie & Motivation</div>
+      <div class="gl-h2">Das «Es-ist-sowieso-egal»-Gefühl</div>
+      <p class="gl-p">Es ist nicht Faulheit, sondern <strong>erlernte Hilflosigkeit</strong> (Seligman & Maier, 1967). Wenn das Gehirn wiederholt erlebt, dass eigene Anstrengung nichts ändert, schaltet es ab. Das ist kein Charakterfehler, sondern ein Schutzmechanismus.</p>
+
+      <div class="gl-h3">3 Kernerkenntnisse aus der Forschung</div>
+      <div class="gl-step">
+        <div class="gl-step-num">1</div>
+        <div class="gl-step-body"><strong>Der Ausstieg beginnt mit einer winzigen, sichtbar abgeschlossenen Handlung.</strong> Eine Karteikarte. Ein Pomodoro. Erst danach kommt die Motivation — nicht umgekehrt.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">2</div>
+        <div class="gl-step-body"><strong>Sichtbarer Fortschritt durchbricht die Hilflosigkeit.</strong> Deshalb hat dieses Tool eine prominente Fortschrittsanzeige pro Fach.</div>
+      </div>
+      <div class="gl-step">
+        <div class="gl-step-num">3</div>
+        <div class="gl-step-body"><strong>Selbst-Mitgefühl schlägt Selbstdisziplin.</strong> Breines & Chen (2012): Teilnehmende nach einer Niederlage in der Selbstmitgefühl-Bedingung lernten mehr für den Folgetest als die Kontrollgruppe.</div>
+      </div>
+
+      <div class="gl-h3">6 Techniken gegen Hoffnungslosigkeit (→ Notfall-Button)</div>
+      <div class="gl-technique gr">
+        <div class="gl-technique-title">⏱ Die 5-Minuten-Regel</div>
+        <div class="gl-technique-body">«Ich setze mich nur 5 Minuten hin und mache eine einzige Karteikarte.» In 80% der Fälle entstehen daraus 25 Minuten. In den anderen 20%: dann waren es 5 echte, fokussierte Minuten — das zählt.</div>
+      </div>
+      <div class="gl-technique gr">
+        <div class="gl-technique-title">✂ Den Berg zerschneiden</div>
+        <div class="gl-technique-body">Statt «ich muss die ganze Biologie lernen» → «ich lese heute Seite 12–18 zum Thema Zellatmung». Vage Ziele triggern Lähmung, präzise Ziele triggern Handlung.</div>
+      </div>
+      <div class="gl-technique te">
+        <div class="gl-technique-title">🧠 Worst-Case-Reframe</div>
+        <div class="gl-technique-body">Was ist das Schlimmste, das passieren kann? Die Passerelle nicht bestehen. Konsequenz: einmalige Wiederholung möglich (SBFI offiziell vorgesehen) oder Wechsel an die Fachhochschule. Kein Lebensende. Das nimmt Druck.</div>
+      </div>
+      <div class="gl-technique gr">
+        <div class="gl-technique-title">💚 Die «Egal-wenn»-Liste</div>
+        <div class="gl-technique-body">Drei Sätze aufschreiben: «Es ist okay, wenn ich heute nur 3 Stunden lerne statt 6.» Solche Selbstdistanzierung setzt den präfrontalen Kortex wieder frei.</div>
+      </div>
+      <div class="gl-technique bl">
+        <div class="gl-technique-title">🚶 Bewegung statt Grübeln</div>
+        <div class="gl-technique-body">Hillman et al. (2009): 20 Minuten zügiges Gehen bei 60% Herzfrequenz verbessert Aufmerksamkeit signifikant. Frontiers in Public Health (2018): 10,6% Verbesserung in PISA-Aufgaben. Vor schwierigen Sessions einplanen.</div>
+      </div>
+      <div class="gl-technique bl">
+        <div class="gl-technique-title">🌬 Box-Atmung 4-4-4-4</div>
+        <div class="gl-technique-body">Einatmen (4 Sek.) – Halten (4 Sek.) – Ausatmen (4 Sek.) – Halten (4 Sek.). 5 Runden beruhigen das Nervensystem sofort — ohne Medikamente, ohne Hilfsmittel.</div>
+      </div>
+
+      <div class="gl-h3">Echte Stimmen aus der Recherche</div>
+      <div class="gl-quote-block">
+        <p>«Bei der Passerelle handelt es sich nicht um den Schwierigkeitsgrad, sondern um die Stoffmenge, die Zeit und die Fähigkeit, sich selbst zu motivieren, da du innerhalb einem Lehrjahr die ganze Lernstoffe von 3-jährig-gymnasialer Ausbildung durchkauen musst.»</p>
+        <cite>— Bloggerin von swisspasserelle.wordpress.com</cite>
+      </div>
+      <div class="gl-quote-block">
+        <p>«Vernachlässigt nicht euren Schlaf und Hobbys — balance ist key. Müde und unzufrieden lernt es sich nicht gut.»</p>
+        <cite>— Lea, Passerelle Winter 2024, bestanden, heute Studentin Nanowissenschaften</cite>
+      </div>
+      <div class="gl-quote-block">
+        <p>«Ich verbrachte ein halbes Jahr lang jeden Wochentag 3–5 Stunden mit Lernen, um auch sicher zu bestehen.»</p>
+        <cite>— Nils, Passerelle 2021, bestanden, heute ETH</cite>
+      </div>
+      <div class="gl-quote-block">
+        <p>«Jedoch war z.T. meine Psyche am Ende. Dadurch, dass ich 80% arbeitete, war es extrem anstrengend. Der Alltag bestand nur aus Arbeiten und Lernen.»</p>
+        <cite>— Anonymer Erfahrungsbericht einer AKAD-Passerelle-Absolventin</cite>
+      </div>
+    </div>
+
+    <!-- D: LERNPLAN -->
+    <div class="card gl-section">
+      <div class="gl-label">Abschnitt D — Lernplan-Aufbau</div>
+      <div class="gl-h2">Eine strukturierte Lerneinheit (90 Min.)</div>
+      <table class="gl-table">
+        <thead><tr><th>Phase</th><th>Zeit</th><th>Was</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Aufwärmen</strong></td><td>5 Min.</td><td>3 Karteikarten zum gestern Gelernten (aktiver Abruf)</td></tr>
+          <tr><td><strong>Neuer Stoff</strong></td><td>25 Min.</td><td>Buch/Skript lesen ODER YouTube, parallel Stichworte</td></tr>
+          <tr><td><strong>Pause</strong></td><td>5 Min.</td><td>Wasser, Fenster auf, 1 Min. tief atmen</td></tr>
+          <tr><td><strong>Üben</strong></td><td>25 Min.</td><td>Aufgaben rechnen / Fragen aus alter Prüfung</td></tr>
+          <tr><td><strong>Pause</strong></td><td>5 Min.</td><td>wie oben</td></tr>
+          <tr><td><strong>Sicherung</strong></td><td>20 Min.</td><td>5–10 neue Karteikarten + rückwärts erklären: «Was habe ich gelernt?»</td></tr>
+          <tr><td><strong>Plan</strong></td><td>5 Min.</td><td>Notieren, was morgen offen ist</td></tr>
+        </tbody>
+      </table>
+
+      <div class="gl-h3">4-Wochen-Sprint-Prinzip</div>
+      <p class="gl-p">Längere Pläne als 4 Wochen sind Selbstbetrug. Ende jeder vierten Woche: 1 Stunde Reflexion + neuer Sprint mit aktualisierter Stoff-Hierarchie. Reality-Check alle 2 Wochen: eine alte Prüfung lösen, ehrlich korrigieren.</p>
+
+      <div class="gl-h3">Notfall-Modus: nur noch 6–8 Wochen</div>
+      <div class="gl-technique te">
+        <div class="gl-technique-body">Stoff komplett auf Stufe A reduzieren · nur noch alte Prüfungen lösen (eine pro Fach pro Woche) · Mathematik und Naturwissenschaften priorisieren · 2 Tage vor jeder Prüfung aufhören zu lernen — schlafen, spazieren, essen.</div>
+      </div>
+    </div>
+
+    <!-- Credits -->
+    <div class="gl-credits">
+      <strong>Über dieses Tool</strong>
+      Entwickelt auf Basis einer umfassenden Recherche zum Passerellen-Lehrgang Basel-Stadt.<br>
+      Quellen: SBFI-Richtlinien 2023 · Medienmitteilung Kanton Basel-Stadt 19.09.2022 · Erfahrungsberichte von passerelle-bestehen.ch, swisspasserelle.wordpress.com, hilferuf.de · Wissenschaftliche Grundlagen: Seligman &amp; Maier (1967), Dunlosky et al. (2013), Breines &amp; Chen (2012), Hillman et al. (2009).<br><br>
+      Das Tool ersetzt weder einen Therapeuten noch eine professionelle Lernberatung — es ist ein Selbsthilfe-Werkzeug für den Alltag.
+    </div>
+
+  </div>
+
 </main>
 
 <!-- Notfall-FAB -->
@@ -1231,28 +1621,28 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div class="overlay-sub">Du musst jetzt nichts leisten. Was brauchst du gerade?</div>
       <div class="emergency-options">
         <button class="emergency-option" onclick="startBreathing()">
-          <div class="emergency-option-title">🌬 5 Minuten Atemübung</div>
-          <div class="emergency-option-desc">Box-Atmung 4-4-4-4 · beruhigt das Nervensystem</div>
+          <div class="emergency-option-title">🌬 5 Minuten Atemübung <span class="ref-badge" style="pointer-events:none;vertical-align:middle;">📖 C2</span></div>
+          <div class="emergency-option-desc">Box-Atmung 4-4-4-4 · beruhigt das Nervensystem sofort</div>
         </button>
         <button class="emergency-option" onclick="startWalk()">
-          <div class="emergency-option-title">🚶 20 Minuten spazieren gehen</div>
-          <div class="emergency-option-desc">Timer startet – du kannst das Gerät weglegen</div>
+          <div class="emergency-option-title">🚶 20 Minuten spazieren <span class="ref-badge" style="pointer-events:none;vertical-align:middle;">📖 C2</span></div>
+          <div class="emergency-option-desc">Hillman et al. (2009): 20 Min. Gehen verbessert Aufmerksamkeit messbar. Timer startet – Gerät weglegen.</div>
         </button>
         <button class="emergency-option" onclick="closeEmergency(); switchTab('stoff')">
           <div class="emergency-option-title">🃏 Nur eine einzige Aufgabe</div>
           <div class="emergency-option-desc">Direkt zum Stoff – erste unfertige Aufgabe aufmachen</div>
         </button>
         <button class="emergency-option" onclick="show5MinutenRegel()">
-          <div class="emergency-option-title">⏱ 5-Minuten-Regel</div>
-          <div class="emergency-option-desc">Wenn nichts mehr geht: nur 5 Minuten. Einfach anfangen — meistens werden daraus 25.</div>
+          <div class="emergency-option-title">⏱ 5-Minuten-Regel <span class="ref-badge" style="pointer-events:none;vertical-align:middle;">📖 C2</span></div>
+          <div class="emergency-option-desc">Wenn nichts mehr geht: nur 5 Minuten. In 80% der Fälle werden daraus 25.</div>
         </button>
         <button class="emergency-option" onclick="showWorstCase()">
-          <div class="emergency-option-title">🧠 Worst-Case durchdenken</div>
+          <div class="emergency-option-title">🧠 Worst-Case-Reframe <span class="ref-badge" style="pointer-events:none;vertical-align:middle;">📖 C2</span></div>
           <div class="emergency-option-desc">Was ist das Schlimmste, das passieren kann? Meistens viel weniger schlimm als gedacht.</div>
         </button>
         <button class="emergency-option" onclick="showEgalWenn()">
-          <div class="emergency-option-title">💚 Egal-wenn-Liste</div>
-          <div class="emergency-option-desc">Entlastende Sätze — dein Erlaubniszettel für unvollständige Tage.</div>
+          <div class="emergency-option-title">💚 Egal-wenn-Liste <span class="ref-badge" style="pointer-events:none;vertical-align:middle;">📖 C2</span></div>
+          <div class="emergency-option-desc">Drei Sätze: «Es ist okay, wenn...» — Entlastung für den präfrontalen Kortex.</div>
         </button>
       </div>
       <button class="btn btn-outline full-width" onclick="closeEmergency()">Schliessen</button>
@@ -1614,7 +2004,7 @@ function importData(ev) {
 // NAVIGATION
 // ============================================================
 function switchTab(tab) {
-  const panels = ['heute', 'stoff', 'plan'];
+  const panels = ['heute', 'stoff', 'plan', 'grundlage'];
   panels.forEach((p, i) => {
     const active = p === tab;
     document.getElementById('panel-' + p).classList.toggle('active', active);
@@ -1624,6 +2014,12 @@ function switchTab(tab) {
   });
   if (tab === 'plan') { renderWeekPlan(); renderSessionLog(); renderReviews(); }
   if (tab === 'stoff') { renderSubjectTabs(); renderTopics(); }
+}
+
+function toggleRef(id) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  card.classList.toggle('hidden');
 }
 
 // ============================================================
