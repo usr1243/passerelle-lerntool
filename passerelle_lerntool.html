@@ -20,6 +20,25 @@ Inhalte anpassen (ohne Programmierkenntnisse):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Passerelle Lerntool</title>
+
+  <!-- ============================================================
+       PWA / WEB-APP MODUS
+       Damit die Seite auf iPhone/iPad wie eine eigene App öffnet:
+       1. In Safari auf die Seite gehen
+       2. Teilen-Symbol antippen (Quadrat mit Pfeil nach oben)
+       3. «Zum Home-Bildschirm» wählen
+       → Öffnet sich danach ohne Safari-Leiste als eigene App
+       ============================================================ -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Lerntool">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FAF7F2">
+  <!-- App-Icon für iOS Homebildschirm (grünes P auf Beige) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjM4IiBmaWxsPSIjNEE3QzU5Ii8+PHRleHQgeD0iOTAiIHk9IjEyOCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMTA4IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZBRjdGMiI+UDwvdGV4dD48L3N2Zz4=">
+  <!-- Web App Manifest (für Android/Chrome Install-Prompt) -->
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlBhc3NlcmVsbGUgTGVybnRvb2wiLCAic2hvcnRfbmFtZSI6ICJMZXJudG9vbCIsICJkZXNjcmlwdGlvbiI6ICJPZmZsaW5lLUxlcm50b29sIGZ1ZXIgZGllIFBhc3NlcmVsbGUiLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwgImJhY2tncm91bmRfY29sb3IiOiAiI0ZBRjdGMiIsICJ0aGVtZV9jb2xvciI6ICIjNEE3QzU5IiwgInN0YXJ0X3VybCI6ICIuIn0=">
+
   <!-- Google Fonts – nur wenn online; offline greift der Fallback -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
