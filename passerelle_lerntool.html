@@ -1021,6 +1021,27 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       border-radius: var(--radius); padding: 1rem 1.1rem;
       font-size: 0.92rem; line-height: 1.6; color: var(--text); margin-bottom: 1rem;
     }
+    /* Ausklappbarer Hinweis (Üben-Tab) */
+    .hint-collapsible {
+      background: var(--bg-subtle); border: 1px solid var(--border-strong);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .hint-collapsible summary {
+      display: flex; align-items: center; gap: 0.45em;
+      padding: 0.7rem 1rem; cursor: pointer; user-select: none;
+      font-size: 0.88rem; font-weight: 600; color: var(--text);
+      list-style: none;
+    }
+    .hint-collapsible summary::-webkit-details-marker { display: none; }
+    .hint-collapsible summary::before {
+      content: '▸'; font-size: 0.7rem; color: var(--text-light);
+      transition: transform 0.2s ease; flex-shrink: 0;
+    }
+    .hint-collapsible[open] summary::before { transform: rotate(90deg); }
+    .hint-collapsible .hint-body {
+      padding: 0 1rem 0.9rem; font-size: 0.88rem;
+      line-height: 1.6; color: var(--text-light);
+    }
     .onb-nav { margin-top: 1.75rem; }
     .onb-nav .btn { min-height: 52px; font-size: 1rem; }
     /* warmer Primär-Button im Setup (terracotta statt blau) */
@@ -1795,16 +1816,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <div class="card">
       <div class="card-title">Üben<span class="ki-badge">✦ KI</span></div>
 
-      <!-- Erklärung & Voraussetzung -->
-      <div class="onb-tip" style="margin-bottom:1.25rem;">
-        <strong>So funktioniert das Üben:</strong>
-        Wähle ein Fach und ein Thema — die KI generiert daraus
-        Karteikarten oder prüfungsnahe Fragen <em>ausschliesslich</em>
-        aus deinen erfassten Lernzielen, auf Passerelle-Niveau.<br><br>
-        <strong>Voraussetzung:</strong> Gehe zuerst in den Tab
-        <strong>«Stoff»</strong> und erfasse dort Lernziele (per KI-Import
-        oder manuell). Erst dann erscheinen hier Themen zur Auswahl.
-      </div>
+      <!-- Erklärung & Voraussetzung (ausklappbar) -->
+      <details class="hint-collapsible" style="margin-bottom:1.25rem;">
+        <summary>So funktioniert's</summary>
+        <div class="hint-body">
+          Wähle ein Fach und ein Thema — die KI generiert daraus
+          Karteikarten oder prüfungsnahe Fragen <em>ausschliesslich</em>
+          aus deinen erfassten Lernzielen, auf Passerelle-Niveau.<br><br>
+          <strong>Voraussetzung:</strong> Erfasse zuerst Lernziele im Tab
+          <strong>«Stoff»</strong> (KI-Import oder manuell) — erst dann
+          erscheinen hier Themen zur Auswahl.
+        </div>
+      </details>
 
       <!-- Auswahl -->
       <div class="ueben-grid">
