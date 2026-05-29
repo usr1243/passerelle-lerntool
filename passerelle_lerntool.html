@@ -793,6 +793,63 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .lz-empty { font-size: 0.8rem; color: var(--text-light); padding: 0.3rem 0 0.1rem 0.4rem; }
 
     /* ============================================================
+       ÜBEN-TAB: Karteikarten & Selbsttest
+       ============================================================ */
+    .ueben-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    @media (max-width: 480px) { .ueben-grid { grid-template-columns: 1fr; } }
+
+    .mode-switch { display: flex; gap: 0.4rem; background: var(--bg-subtle); border-radius: var(--radius); padding: 0.25rem; }
+    .mode-btn {
+      flex: 1; padding: 0.55rem 0.5rem; border: none; background: transparent;
+      border-radius: calc(var(--radius) - 0.25rem); cursor: pointer;
+      font-size: 0.85rem; font-weight: 600; color: var(--text-light);
+      min-height: 44px; transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+    }
+    .mode-btn.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow-xs); }
+
+    /* Quizlet-artige Flip-Karte */
+    .flashcard { perspective: 1200px; cursor: pointer; user-select: none; margin-bottom: 0.5rem; }
+    .flashcard-inner {
+      position: relative; width: 100%; min-height: 220px;
+      transition: transform 0.5s cubic-bezier(0.4,0.2,0.2,1);
+      transform-style: preserve-3d;
+    }
+    .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+    .flashcard-face {
+      position: absolute; inset: 0;
+      -webkit-backface-visibility: hidden; backface-visibility: hidden;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      padding: 1.5rem 1.25rem; border-radius: var(--radius-lg);
+      font-size: 1.05rem; line-height: 1.55; overflow-wrap: anywhere;
+      box-shadow: var(--shadow-xs); border: 1.5px solid var(--border);
+    }
+    .flashcard-front { background: var(--bg-card); color: var(--text); font-weight: 600; }
+    .flashcard-back { background: var(--green-light); color: var(--text); transform: rotateY(180deg); border-color: var(--green-mid); }
+    .flashcard-hint { text-align: center; margin: 0.5rem 0 0.75rem; }
+    .flashcard-nav { display: grid; grid-template-columns: auto 1fr 1fr auto; gap: 0.5rem; }
+    .flashcard-nav .btn { min-height: 44px; }
+    @media (prefers-reduced-motion: reduce) {
+      .flashcard-inner { transition: none; }
+    }
+
+    /* Quiz */
+    .quiz-q { font-size: 1.02rem; font-weight: 600; line-height: 1.5; margin-bottom: 1rem; }
+    .quiz-opt {
+      display: block; width: 100%; text-align: left; margin-bottom: 0.5rem;
+      padding: 0.7rem 0.85rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+      background: var(--bg-card); color: var(--text); cursor: pointer; font-size: 0.9rem; line-height: 1.4;
+      min-height: 44px; transition: border-color var(--transition), background var(--transition);
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--border-strong); background: var(--bg-subtle); }
+    .quiz-opt.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+    .quiz-opt.wrong { border-color: var(--terracotta); background: var(--terracotta-light); color: var(--terracotta); }
+    .quiz-explain { font-size: 0.85rem; line-height: 1.55; color: var(--text-light); background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 0.7rem 0.85rem; margin: 0.75rem 0; }
+    .quiz-explain strong { color: var(--text); }
+    .quiz-self { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
+    .quiz-self .btn { flex: 1; min-height: 44px; }
+    .quiz-open-input { width: 100%; min-height: 80px; margin-bottom: 0.5rem; }
+
+    /* ============================================================
        WOCHENPLAN
        ============================================================ */
     .week-grid { display: grid; gap: 0.75rem; }
@@ -1643,10 +1700,71 @@ Inhalte anpassen (ohne Programmierkenntnisse):
   <div id="panel-ueben" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-title">Üben</div>
-      <p class="text-sm text-light" style="line-height:1.7;">
+      <p class="text-sm text-light" style="line-height:1.6;margin-bottom:1rem;">
         Karteikarten und Selbsttests — generiert aus deinen erfassten Lernzielen, auf Passerelle-Niveau.
-        Erfasse zuerst im Tab <strong>Stoff</strong> deine Themen und Lernziele, dann kannst du hier gezielt üben.
       </p>
+
+      <!-- Auswahl -->
+      <div class="ueben-grid">
+        <div class="form-group">
+          <label class="form-label" for="uebenSubject">Fach</label>
+          <select id="uebenSubject" onchange="onUebenSubjectChange()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="uebenTopic">Thema</label>
+          <select id="uebenTopic"></select>
+        </div>
+      </div>
+
+      <!-- Modus -->
+      <div class="form-group" style="margin-bottom:0.75rem;">
+        <label class="form-label">Modus</label>
+        <div class="mode-switch">
+          <button class="mode-btn active" id="modeFlash" onclick="setUebenMode('flash')">🃏 Karteikarten</button>
+          <button class="mode-btn" id="modeQuiz" onclick="setUebenMode('quiz')">📝 Selbsttest</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary full-width" id="uebenGenBtn" onclick="generateUeben()">Generieren</button>
+      <div id="uebenLoading" class="hidden" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:0.85rem;">
+        <div style="margin-bottom:0.4rem;">Wird generiert…</div>
+        <div class="text-sm">Die KI braucht meist 3–8 Sekunden.</div>
+      </div>
+      <div id="uebenError" class="hidden" style="margin-top:0.75rem;padding:0.6rem 0.8rem;background:var(--terracotta-light);border-radius:var(--radius-sm);color:var(--terracotta);font-size:0.85rem;"></div>
+      <div id="uebenEmpty" class="hidden" style="margin-top:0.75rem;font-size:0.85rem;color:var(--text-light);"></div>
+    </div>
+
+    <!-- Karteikarten-Lernmodus -->
+    <div class="card hidden" id="flashcardArea">
+      <div class="flex-between" style="margin-bottom:0.75rem;">
+        <span class="text-sm text-light" id="flashProgress">Karte 1 von 1</span>
+        <button class="btn btn-outline btn-sm" onclick="shuffleFlashcards()" aria-label="Karten mischen">🔀 Mischen</button>
+      </div>
+      <div class="flashcard" id="flashcard" onclick="flipFlashcard()" role="button" tabindex="0"
+           aria-label="Karteikarte – tippen zum Umdrehen"
+           onkeydown="if(event.key==='Enter'){flipFlashcard();}">
+        <div class="flashcard-inner" id="flashcardInner">
+          <div class="flashcard-face flashcard-front"><span id="flashFront"></span></div>
+          <div class="flashcard-face flashcard-back"><span id="flashBack"></span></div>
+        </div>
+      </div>
+      <div class="flashcard-hint text-sm text-light">Tippen oder Leertaste zum Umdrehen · ← → zum Blättern</div>
+      <div class="flashcard-nav">
+        <button class="btn btn-outline" onclick="prevFlashcard()" aria-label="Vorherige Karte">←</button>
+        <button class="btn btn-danger" onclick="rateFlashcard(false)">Nochmal</button>
+        <button class="btn btn-success" onclick="rateFlashcard(true)">Kann ich ✓</button>
+        <button class="btn btn-outline" onclick="nextFlashcard()" aria-label="Nächste Karte">→</button>
+      </div>
+      <div id="flashDone" class="hidden" style="margin-top:1rem;text-align:center;"></div>
+    </div>
+
+    <!-- Selbsttest / Quiz -->
+    <div class="card hidden" id="quizArea">
+      <div class="flex-between" style="margin-bottom:0.75rem;">
+        <span class="text-sm text-light" id="quizProgress">Frage 1 von 1</span>
+        <span class="text-sm text-light" id="quizScore"></span>
+      </div>
+      <div id="quizBody"></div>
     </div>
   </div>
 
@@ -2435,8 +2553,307 @@ function updateAccordionBadges() {
   if (el4) el4.textContent = todayJournals + ' Eintr.';
 }
 
+// ============================================================
+// ÜBEN: Karteikarten & Selbsttest (KI, aus Lernzielen)
+// ============================================================
+const ueben = {
+  mode: 'flash',
+  cards: [], idx: 0, known: new Set(),
+  quiz: [], qIdx: 0, score: 0, answered: false, wrong: [],
+};
+
 function renderUeben() {
-  // Phase 3/4: Karteikarten- & Selbsttest-Generator. Aktuell statischer Platzhalter-Panel.
+  const subjSel = document.getElementById('uebenSubject');
+  if (!subjSel) return;
+  const subjects = Object.keys(state.triage);
+  const prev = subjSel.value;
+  subjSel.innerHTML = subjects.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  if (prev && subjects.includes(prev)) subjSel.value = prev;
+  onUebenSubjectChange();
+}
+
+function onUebenSubjectChange() {
+  const subj = document.getElementById('uebenSubject').value;
+  const topics = (state.triage[subj] || []).filter(t => Array.isArray(t.lernziele) && t.lernziele.length > 0);
+  const topicSel = document.getElementById('uebenTopic');
+  const hasA = (state.triage[subj] || []).some(t => t.level === 'A' && Array.isArray(t.lernziele) && t.lernziele.length > 0);
+  let opts = '';
+  if (hasA) opts += `<option value="__allA">Alle A-Themen (mit Lernzielen)</option>`;
+  opts += topics.map(t => `<option value="${t.id}">${esc(t.name)} (${t.lernziele.length} LZ)</option>`).join('');
+  if (!opts) opts = `<option value="">— keine Themen mit Lernzielen —</option>`;
+  topicSel.innerHTML = opts;
+}
+
+function setUebenMode(mode) {
+  ueben.mode = mode;
+  document.getElementById('modeFlash').classList.toggle('active', mode === 'flash');
+  document.getElementById('modeQuiz').classList.toggle('active', mode === 'quiz');
+}
+
+// Sammelt die Lernziele für die aktuelle Auswahl (einzelnes Thema oder "alle A").
+function collectUebenLernziele() {
+  const subj = document.getElementById('uebenSubject').value;
+  const sel = document.getElementById('uebenTopic').value;
+  const topics = state.triage[subj] || [];
+  let chosen = [];
+  let topicLabel = '';
+  if (sel === '__allA') {
+    chosen = topics.filter(t => t.level === 'A' && Array.isArray(t.lernziele) && t.lernziele.length);
+    topicLabel = 'Alle A-Themen';
+  } else {
+    const t = topics.find(x => x.id === sel);
+    if (t) { chosen = [t]; topicLabel = t.name; }
+  }
+  const lernziele = [];
+  chosen.forEach(t => (t.lernziele || []).forEach(lz => {
+    if (lz && lz.text) lernziele.push({ text: lz.text, sub: (lz.sub || []).map(s => ({ text: s.text })) });
+  }));
+  return { subject: subj, topic: topicLabel, lernziele };
+}
+
+async function generateUeben() {
+  const { subject, topic, lernziele } = collectUebenLernziele();
+  const errorEl = document.getElementById('uebenError');
+  const emptyEl = document.getElementById('uebenEmpty');
+  const loading = document.getElementById('uebenLoading');
+  const btn = document.getElementById('uebenGenBtn');
+  errorEl.classList.add('hidden');
+  emptyEl.classList.add('hidden');
+  document.getElementById('flashcardArea').classList.add('hidden');
+  document.getElementById('quizArea').classList.add('hidden');
+
+  if (!lernziele.length) {
+    emptyEl.textContent = 'Dieses Thema hat noch keine Lernziele. Erfasse sie zuerst im Tab «Stoff».';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+
+  const mode = ueben.mode === 'quiz' ? 'quiz' : 'flashcards';
+  btn.disabled = true;
+  loading.classList.remove('hidden');
+  try {
+    const res = await fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode, subject, topic, lernziele }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = data.error || 'Unbekannter Fehler.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (mode === 'flashcards') {
+      const cards = Array.isArray(data.cards) ? data.cards.filter(c => c && c.front && c.back) : [];
+      if (!cards.length) { errorEl.textContent = 'Keine Karten erhalten. Bitte erneut versuchen.'; errorEl.classList.remove('hidden'); return; }
+      startFlashcards(cards);
+    } else {
+      const qs = Array.isArray(data.questions) ? data.questions.filter(q => q && q.q && q.answer) : [];
+      if (!qs.length) { errorEl.textContent = 'Keine Fragen erhalten. Bitte erneut versuchen.'; errorEl.classList.remove('hidden'); return; }
+      startQuiz(qs);
+    }
+  } catch (e) {
+    errorEl.textContent = 'Keine Verbindung. Im Offline-Modus nicht verfügbar.';
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    loading.classList.add('hidden');
+  }
+}
+
+// ---------- Karteikarten ----------
+function startFlashcards(cards) {
+  ueben.cards = cards;
+  ueben.idx = 0;
+  ueben.known = new Set();
+  document.getElementById('flashcardArea').classList.remove('hidden');
+  document.getElementById('flashDone').classList.add('hidden');
+  showFlashcard();
+}
+
+function showFlashcard() {
+  if (ueben.idx >= ueben.cards.length) { showFlashDone(); return; }
+  const c = ueben.cards[ueben.idx];
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('flashFront').textContent = c.front;
+  document.getElementById('flashBack').textContent = c.back;
+  document.getElementById('flashProgress').textContent =
+    `Karte ${ueben.idx + 1} von ${ueben.cards.length} · ${ueben.known.size} gekonnt`;
+  document.getElementById('flashDone').classList.add('hidden');
+  document.getElementById('flashcard').classList.remove('hidden');
+}
+
+function flipFlashcard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function nextFlashcard() {
+  if (ueben.idx < ueben.cards.length) ueben.idx++;
+  showFlashcard();
+}
+
+function prevFlashcard() {
+  if (ueben.idx > 0) { ueben.idx--; showFlashcard(); }
+}
+
+function rateFlashcard(known) {
+  if (ueben.idx >= ueben.cards.length) return;
+  if (known) ueben.known.add(ueben.idx); else ueben.known.delete(ueben.idx);
+  nextFlashcard();
+}
+
+function shuffleFlashcards() {
+  for (let i = ueben.cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ueben.cards[i], ueben.cards[j]] = [ueben.cards[j], ueben.cards[i]];
+  }
+  ueben.idx = 0;
+  ueben.known = new Set();
+  showFlashcard();
+}
+
+function showFlashDone() {
+  document.getElementById('flashcard').classList.add('hidden');
+  const total = ueben.cards.length;
+  const knownN = ueben.known.size;
+  const hardN = total - knownN;
+  const done = document.getElementById('flashDone');
+  document.getElementById('flashProgress').textContent = `Durchgang fertig`;
+  let html = `<div style="font-size:1.05rem;font-weight:600;margin-bottom:0.3rem;">Geschafft! 🎉</div>`;
+  html += `<div class="text-sm text-light" style="margin-bottom:1rem;">${knownN} von ${total} als «kann ich» markiert.</div>`;
+  html += `<div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;">`;
+  if (hardN > 0) html += `<button class="btn btn-primary" onclick="repeatHardFlashcards()">${hardN} schwierige wiederholen</button>`;
+  html += `<button class="btn btn-outline" onclick="restartFlashcards()">Von vorne</button>`;
+  html += `</div>`;
+  done.innerHTML = html;
+  done.classList.remove('hidden');
+}
+
+function restartFlashcards() {
+  ueben.idx = 0;
+  ueben.known = new Set();
+  showFlashcard();
+}
+
+function repeatHardFlashcards() {
+  const hard = ueben.cards.filter((_, i) => !ueben.known.has(i));
+  if (!hard.length) { restartFlashcards(); return; }
+  startFlashcards(hard);
+}
+
+// ---------- Selbsttest / Quiz ----------
+function startQuiz(questions) {
+  ueben.quiz = questions;
+  ueben.qIdx = 0;
+  ueben.score = 0;
+  ueben.answered = false;
+  ueben.wrong = [];
+  document.getElementById('quizArea').classList.remove('hidden');
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = ueben.quiz[ueben.qIdx];
+  ueben.answered = false;
+  document.getElementById('quizProgress').textContent = `Frage ${ueben.qIdx + 1} von ${ueben.quiz.length}`;
+  document.getElementById('quizScore').textContent = `${formatScore(ueben.score)} Pkt`;
+  const body = document.getElementById('quizBody');
+  let html = `<div class="quiz-q">${esc(q.q)}</div>`;
+  if (q.type === 'mc' && Array.isArray(q.options)) {
+    html += `<div id="quizOpts">`;
+    q.options.forEach((opt, i) => {
+      html += `<button class="quiz-opt" data-opt="${i}" onclick="answerMc(${i})">${esc(opt)}</button>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="quiz-open-input" id="quizOpenInput" placeholder="Deine Antwort…"></textarea>`;
+    html += `<button class="btn btn-primary" onclick="revealOpenAnswer()">Antwort aufdecken</button>`;
+  }
+  html += `<div id="quizFeedback"></div>`;
+  body.innerHTML = html;
+}
+
+function answerMc(i) {
+  if (ueben.answered) return;
+  ueben.answered = true;
+  const q = ueben.quiz[ueben.qIdx];
+  const opts = document.querySelectorAll('#quizOpts .quiz-opt');
+  const chosen = q.options[i];
+  const correct = String(chosen).trim() === String(q.answer).trim();
+  opts.forEach((b, j) => {
+    b.disabled = true;
+    if (String(q.options[j]).trim() === String(q.answer).trim()) b.classList.add('correct');
+    else if (j === i) b.classList.add('wrong');
+  });
+  if (correct) ueben.score += 1; else ueben.wrong.push(q.lernzielRef || q.q);
+  document.getElementById('quizScore').textContent = `${formatScore(ueben.score)} Pkt`;
+  showQuizFeedback();
+}
+
+function revealOpenAnswer() {
+  if (ueben.answered) return;
+  ueben.answered = true;
+  const q = ueben.quiz[ueben.qIdx];
+  const fb = document.getElementById('quizFeedback');
+  let html = `<div class="quiz-explain"><strong>Musterlösung:</strong> ${esc(q.answer)}</div>`;
+  html += `<div class="text-sm text-light" style="margin-bottom:0.3rem;">Wie war deine Antwort?</div>`;
+  html += `<div class="quiz-self">`;
+  html += `<button class="btn btn-success" onclick="selfAssess(1)">Richtig</button>`;
+  html += `<button class="btn btn-outline" onclick="selfAssess(0.5)">Teilweise</button>`;
+  html += `<button class="btn btn-danger" onclick="selfAssess(0)">Falsch</button>`;
+  html += `</div>`;
+  fb.innerHTML = html;
+}
+
+function selfAssess(val) {
+  const q = ueben.quiz[ueben.qIdx];
+  ueben.score += val;
+  if (val < 1) ueben.wrong.push(q.lernzielRef || q.q);
+  document.getElementById('quizScore').textContent = `${formatScore(ueben.score)} Pkt`;
+  // Self-assess-Buttons sperren und Erklärung + Weiter zeigen
+  const self = document.querySelector('.quiz-self');
+  if (self) self.querySelectorAll('button').forEach(b => b.disabled = true);
+  showQuizFeedback(true);
+}
+
+function showQuizFeedback(append) {
+  const q = ueben.quiz[ueben.qIdx];
+  const fb = document.getElementById('quizFeedback');
+  let html = append ? fb.innerHTML : '';
+  if (q.explanation) html += `<div class="quiz-explain"><strong>Erklärung:</strong> ${esc(q.explanation)}</div>`;
+  const last = ueben.qIdx >= ueben.quiz.length - 1;
+  html += `<button class="btn btn-primary full-width" onclick="nextQuizQuestion()">${last ? 'Auswertung anzeigen' : 'Nächste Frage →'}</button>`;
+  fb.innerHTML = html;
+}
+
+function nextQuizQuestion() {
+  if (ueben.qIdx < ueben.quiz.length - 1) { ueben.qIdx++; renderQuizQuestion(); }
+  else showQuizSummary();
+}
+
+function showQuizSummary() {
+  const total = ueben.quiz.length;
+  const pct = Math.round(ueben.score / total * 100);
+  document.getElementById('quizProgress').textContent = 'Auswertung';
+  const body = document.getElementById('quizBody');
+  let html = `<div style="text-align:center;margin-bottom:1rem;">`;
+  html += `<div style="font-size:2rem;font-weight:700;color:${pct >= 60 ? 'var(--green)' : 'var(--terracotta)'};">${formatScore(ueben.score)} / ${total}</div>`;
+  html += `<div class="text-sm text-light">${pct}% richtig</div></div>`;
+  const weak = [...new Set(ueben.wrong)];
+  if (weak.length) {
+    html += `<div class="text-sm" style="font-weight:600;margin-bottom:0.4rem;">Diese Lernziele nochmal anschauen:</div>`;
+    html += `<ul style="margin:0 0 1rem 1.1rem;padding:0;font-size:0.85rem;line-height:1.6;color:var(--text-light);">`;
+    weak.forEach(w => { html += `<li>${esc(w)}</li>`; });
+    html += `</ul>`;
+  } else {
+    html += `<div class="text-sm" style="color:var(--green);font-weight:600;margin-bottom:1rem;">Alles richtig — stark! 🎉</div>`;
+  }
+  html += `<button class="btn btn-outline full-width" onclick="startQuiz(ueben.quiz)">Test wiederholen</button>`;
+  body.innerHTML = html;
+}
+
+function formatScore(n) {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1).replace('.', ',');
 }
 
 function downloadApp() {
@@ -3735,6 +4152,17 @@ renderAll();
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
+
+// Tastatursteuerung für den Karteikarten-Lernmodus
+document.addEventListener('keydown', (e) => {
+  const fc = document.getElementById('flashcardArea');
+  if (!fc || fc.classList.contains('hidden')) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+  if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); flipFlashcard(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); nextFlashcard(); }
+  else if (e.key === 'ArrowLeft')  { e.preventDefault(); prevFlashcard(); }
+});
 
 // ============================================================
 // SERVICE WORKER – App lokal speichern (offline-fähig)
