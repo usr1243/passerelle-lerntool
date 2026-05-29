@@ -947,6 +947,66 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .overlay-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.02em; }
     .overlay-sub { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.5; }
 
+    /* ============================================================
+       ONBOARDING — vollflächiger 3-Schritt-Assistent
+       ============================================================ */
+    .onboarding {
+      position: fixed; inset: 0; z-index: 1200;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    .onboarding.hidden { display: none; }
+    .onb-progress { position: sticky; top: 0; height: 6px; background: var(--border); flex-shrink: 0; z-index: 2; }
+    .onb-progress-fill {
+      height: 100%; width: 33.33%;
+      background: var(--green); border-radius: 0 3px 3px 0;
+      transition: width 0.45s cubic-bezier(0.4,0.2,0.2,1);
+    }
+    .onb-page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem 3rem; }
+    .onb-content { width: 100%; max-width: 440px; }
+    .onb-step-count {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-xlight); text-align: center; margin-bottom: 1.75rem;
+    }
+    .onb-slide { animation: onbFade 0.35s ease; }
+    .onb-slide.hidden { display: none; }
+    @keyframes onbFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .onb-slide { animation: none; }
+      .onb-progress-fill { transition: none; }
+    }
+    .onb-emoji { font-size: 2.75rem; text-align: center; margin-bottom: 0.85rem; line-height: 1; }
+    .onb-title {
+      font-family: var(--font-serif); font-size: 1.55rem; line-height: 1.25;
+      text-align: center; color: var(--text); margin-bottom: 0.5rem; letter-spacing: -0.01em;
+    }
+    .onb-sub { font-size: 0.95rem; line-height: 1.55; color: var(--text-light); text-align: center; margin-bottom: 2rem; }
+    .onb-field { margin-bottom: 1rem; }
+    .onb-input {
+      width: 100%; font-size: 1.05rem; padding: 0.9rem 1rem;
+      border: 1.5px solid var(--border-strong); border-radius: var(--radius);
+      background: var(--bg-card); color: var(--text); box-shadow: var(--shadow-xs);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .onb-input::placeholder { color: var(--text-xlight); }
+    .onb-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-mid); }
+    .onb-date { min-height: 54px; color: var(--text); cursor: pointer; }
+    .onb-date::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
+    .onb-hint { font-size: 0.78rem; color: var(--text-xlight); margin-top: 0.4rem; }
+    .onb-error { color: var(--terracotta); font-size: 0.85rem; margin-bottom: 0.85rem; font-weight: 600; }
+    .onb-error.hidden { display: none; }
+    .onb-tip {
+      background: var(--blue-light); border-left: 4px solid var(--blue);
+      border-radius: var(--radius); padding: 1rem 1.1rem;
+      font-size: 0.92rem; line-height: 1.6; color: var(--text); margin-bottom: 1rem;
+    }
+    .onb-nav { margin-top: 1.75rem; }
+    .onb-nav .btn { min-height: 52px; font-size: 1rem; }
+    .onb-nav-row { display: flex; gap: 0.75rem; }
+    .onb-nav-row .btn { flex: 1; }
+    .onb-nav-row .btn-outline { flex: 0 0 38%; }
+
     /* Tipps-und-Tricks-Overlay (vollflächig, scrollbar) */
     .tips-overlay {
       position: fixed;
@@ -2227,32 +2287,61 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 <!-- ============================================================
      ONBOARDING-OVERLAY (Erster Besuch)
      ============================================================ -->
-<div class="overlay hidden" id="onboardingOverlay" role="dialog" aria-modal="true" aria-label="Willkommen">
-  <div class="overlay-card" style="text-align:left;">
-    <div style="text-align:center;">
-      <div style="font-size:2rem;margin-bottom:0.3rem;">🌱</div>
-      <div class="overlay-title">Willkommen bei deinem Lerntool</div>
-      <div class="overlay-sub">Lass uns kurz einrichten. Das dauert nur 20 Sekunden.</div>
+<div class="onboarding hidden" id="onboardingOverlay" role="dialog" aria-modal="true" aria-label="Willkommen – Einrichtung">
+  <div class="onb-progress" role="progressbar" aria-label="Einrichtungs-Fortschritt">
+    <div class="onb-progress-fill" id="onbProgressFill"></div>
+  </div>
+  <div class="onb-page">
+    <div class="onb-content">
+      <div class="onb-step-count" id="onbStepCount">Schritt 1 von 3</div>
+
+      <!-- Schritt 1: Name -->
+      <div class="onb-slide" id="onbSlide1">
+        <div class="onb-emoji">🌱</div>
+        <h1 class="onb-title">Willkommen bei deinem Lerntool</h1>
+        <p class="onb-sub">Schön, dass du da bist. Sag mir zuerst, wie du heisst.</p>
+        <div class="onb-field">
+          <label class="form-label" for="onboardingName">Dein Vorname</label>
+          <input type="text" class="onb-input" id="onboardingName" placeholder="z.B. Lara" maxlength="30" autocomplete="given-name"
+                 onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();onbNext();}">
+        </div>
+        <div class="onb-error hidden" id="onbError1"></div>
+        <div class="onb-nav">
+          <button class="btn btn-primary full-width" onclick="onbNext()">Weiter →</button>
+        </div>
+      </div>
+
+      <!-- Schritt 2: Prüfungsdatum -->
+      <div class="onb-slide hidden" id="onbSlide2">
+        <div class="onb-emoji">📅</div>
+        <h1 class="onb-title">Wann ist deine Prüfung?</h1>
+        <p class="onb-sub">Damit ich dir den Countdown und realistische Wochenpläne zeigen kann.</p>
+        <div class="onb-field">
+          <label class="form-label" for="onboardingDate">Passerelle-Prüfungsdatum</label>
+          <input type="date" class="onb-input onb-date" id="onboardingDate" aria-describedby="onbDateHint">
+          <div id="onbDateHint" class="onb-hint">Tippe ins Feld, um einen Kalender zu öffnen.</div>
+        </div>
+        <div class="onb-error hidden" id="onbError2"></div>
+        <div class="onb-nav onb-nav-row">
+          <button class="btn btn-outline" onclick="onbBack()">← Zurück</button>
+          <button class="btn btn-primary" onclick="onbNext()">Weiter →</button>
+        </div>
+      </div>
+
+      <!-- Schritt 3: Tipp zum Start -->
+      <div class="onb-slide hidden" id="onbSlide3">
+        <div class="onb-emoji">💡</div>
+        <h1 class="onb-title">Ein Tipp zum Start</h1>
+        <p class="onb-sub">Eine letzte Sache, bevor du loslegst:</p>
+        <div class="onb-tip">
+          Lies dir die <strong>Tipps und Tricks</strong> durch (das 💡 oben rechts). Die ganze App baut auf dieser Forschungsgrundlage auf — sie verrät dir, <em>warum</em> jedes Feature da ist. Ich öffne sie dir gleich automatisch.
+        </div>
+        <div class="onb-nav onb-nav-row">
+          <button class="btn btn-outline" onclick="onbBack()">← Zurück</button>
+          <button class="btn btn-primary" onclick="completeOnboarding()">Los geht's →</button>
+        </div>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" for="onboardingName">Wie heisst du?</label>
-      <input type="text" id="onboardingName" placeholder="Dein Vorname" maxlength="30" autocomplete="given-name"
-             onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();document.getElementById('onboardingDate').focus();}">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="onboardingDate">Wann ist deine Passerelle-Prüfung?</label>
-      <input type="date" id="onboardingDate" style="width:100%;">
-    </div>
-
-    <div id="onboardingError" class="hidden" style="color:var(--terracotta);font-size:0.82rem;margin-bottom:0.75rem;"></div>
-
-    <div style="background:rgba(91,124,153,0.10);border-left:3px solid var(--blue);border-radius:8px;padding:0.7rem 0.85rem;margin-bottom:1rem;font-size:0.82rem;line-height:1.55;color:var(--text);">
-      💡 <strong>Tipp zum Start:</strong> Lies dir gleich danach die <strong>Tipps und Tricks</strong> durch (💡 oben rechts). Die ganze App baut auf dieser Forschungsgrundlage auf — sie verrät dir, <em>warum</em> jedes Feature da ist.
-    </div>
-
-    <button class="btn btn-primary full-width" onclick="completeOnboarding()">Los geht's →</button>
   </div>
 </div>
 
@@ -3078,37 +3167,66 @@ function renderGreeting() {
 // ============================================================
 // ONBOARDING (Erster Besuch: Name + Prüfungsdatum)
 // ============================================================
+const ONB_TOTAL = 3;
+let onbStep = 1;
+
 function showOnboarding() {
   const ov = document.getElementById('onboardingOverlay');
   if (!ov) return;
   // Bestehende Werte vorbefüllen (falls Profil später bearbeitet wird)
   document.getElementById('onboardingName').value = state.settings.name || '';
   document.getElementById('onboardingDate').value = state.settings.pruefungsDatum || '';
-  document.getElementById('onboardingError').classList.add('hidden');
+  onbGoStep(1);
   ov.classList.remove('hidden');
-  setTimeout(() => document.getElementById('onboardingName').focus(), 100);
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('onboardingName').focus(), 120);
 }
+
+function onbGoStep(n) {
+  onbStep = Math.min(Math.max(n, 1), ONB_TOTAL);
+  for (let i = 1; i <= ONB_TOTAL; i++) {
+    document.getElementById('onbSlide' + i).classList.toggle('hidden', i !== onbStep);
+  }
+  document.getElementById('onbProgressFill').style.width = (onbStep / ONB_TOTAL * 100) + '%';
+  document.getElementById('onbStepCount').textContent = `Schritt ${onbStep} von ${ONB_TOTAL}`;
+  ['onbError1', 'onbError2'].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) e.classList.add('hidden');
+  });
+}
+
+function onbShowError(step, msg) {
+  const e = document.getElementById('onbError' + step);
+  if (e) { e.textContent = msg; e.classList.remove('hidden'); }
+}
+
+function onbNext() {
+  if (onbStep === 1) {
+    const name = document.getElementById('onboardingName').value.trim();
+    if (!name) { onbShowError(1, 'Bitte gib deinen Namen ein.'); document.getElementById('onboardingName').focus(); return; }
+  }
+  if (onbStep === 2) {
+    const date = document.getElementById('onboardingDate').value;
+    if (!date) { onbShowError(2, 'Bitte wähle dein Prüfungsdatum.'); document.getElementById('onboardingDate').focus(); return; }
+  }
+  const target = onbStep + 1;
+  onbGoStep(target);
+  if (target === 2) setTimeout(() => document.getElementById('onboardingDate').focus(), 120);
+}
+
+function onbBack() { onbGoStep(onbStep - 1); }
+
 function completeOnboarding() {
   const name = document.getElementById('onboardingName').value.trim();
   const date = document.getElementById('onboardingDate').value;
-  const err = document.getElementById('onboardingError');
-  if (!name) {
-    err.textContent = 'Bitte gib deinen Namen ein.';
-    err.classList.remove('hidden');
-    document.getElementById('onboardingName').focus();
-    return;
-  }
-  if (!date) {
-    err.textContent = 'Bitte wähle dein Prüfungsdatum.';
-    err.classList.remove('hidden');
-    document.getElementById('onboardingDate').focus();
-    return;
-  }
+  if (!name) { onbGoStep(1); onbShowError(1, 'Bitte gib deinen Namen ein.'); return; }
+  if (!date) { onbGoStep(2); onbShowError(2, 'Bitte wähle dein Prüfungsdatum.'); return; }
   state.settings.name = name;
   state.settings.pruefungsDatum = date;
   cachedGreeting = null; // neu würfeln mit Namen
   save();
   document.getElementById('onboardingOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
   renderAll();
   // Erstbesuch: direkt die Forschungsgrundlage zeigen — die App baut darauf auf.
   showTips();
