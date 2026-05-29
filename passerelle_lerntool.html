@@ -957,14 +957,21 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
     .onboarding.hidden { display: none; }
-    .onb-progress { position: sticky; top: 0; height: 6px; background: var(--border); flex-shrink: 0; z-index: 2; }
+    .onb-progress { position: sticky; top: 0; height: 6px; background: var(--terracotta-light); flex-shrink: 0; z-index: 2; }
     .onb-progress-fill {
       height: 100%; width: 33.33%;
-      background: var(--green); border-radius: 0 3px 3px 0;
+      background: var(--terracotta); border-radius: 0 3px 3px 0;
       transition: width 0.45s cubic-bezier(0.4,0.2,0.2,1);
     }
     .onb-page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem 3rem; }
-    .onb-content { width: 100%; max-width: 440px; }
+    .onb-content {
+      width: 100%; max-width: 460px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: 2.25rem 1.75rem 2rem;
+    }
     .onb-step-count {
       font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
       color: var(--text-xlight); text-align: center; margin-bottom: 1.75rem;
@@ -990,19 +997,25 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       transition: border-color var(--transition), box-shadow var(--transition);
     }
     .onb-input::placeholder { color: var(--text-xlight); }
-    .onb-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-mid); }
+    .onb-input:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(201,112,100,0.18); }
     .onb-date { min-height: 54px; color: var(--text); cursor: pointer; }
     .onb-date::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
     .onb-hint { font-size: 0.78rem; color: var(--text-xlight); margin-top: 0.4rem; }
     .onb-error { color: var(--terracotta); font-size: 0.85rem; margin-bottom: 0.85rem; font-weight: 600; }
     .onb-error.hidden { display: none; }
     .onb-tip {
-      background: var(--blue-light); border-left: 4px solid var(--blue);
+      background: var(--terracotta-light); border-left: 4px solid var(--terracotta);
       border-radius: var(--radius); padding: 1rem 1.1rem;
       font-size: 0.92rem; line-height: 1.6; color: var(--text); margin-bottom: 1rem;
     }
     .onb-nav { margin-top: 1.75rem; }
     .onb-nav .btn { min-height: 52px; font-size: 1rem; }
+    /* warmer Primär-Button im Setup (terracotta statt blau) */
+    .onb-nav .btn-primary {
+      background: var(--terracotta); color: #fff;
+      box-shadow: 0 2px 8px rgba(201,112,100,0.28);
+    }
+    .onb-nav .btn-primary:hover { background: #b85f53; }
     .onb-nav-row { display: flex; gap: 0.75rem; }
     .onb-nav-row .btn { flex: 1; }
     .onb-nav-row .btn-outline { flex: 0 0 38%; }
