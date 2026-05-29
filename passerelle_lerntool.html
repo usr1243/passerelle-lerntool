@@ -225,6 +225,76 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     }
 
     /* ============================================================
+       ACCORDION (Heute-Tab)
+       ============================================================ */
+    .accordion-section {
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+    }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      min-height: 48px;
+      background: var(--bg-card);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: background var(--transition), border-color var(--transition);
+      user-select: none;
+    }
+    .accordion-header:hover { background: #f0ede7; }
+    .accordion-section.open .accordion-header {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: transparent;
+    }
+    .accordion-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .accordion-title {
+      font-family: var(--font-serif);
+      font-size: 0.92rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--text-light);
+    }
+    .accordion-badge {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      background: var(--bg);
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .accordion-chevron {
+      transition: transform 0.25s ease;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      flex-shrink: 0;
+    }
+    .accordion-section.open .accordion-chevron { transform: rotate(180deg); }
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+    }
+    .accordion-section.open .accordion-body { max-height: 2000px; }
+    .accordion-body-inner { padding: 1rem; }
+    @media (prefers-reduced-motion: reduce) {
+      .accordion-body { transition: none; }
+      .accordion-chevron { transition: none; }
+    }
+
+    /* ============================================================
        BUTTONS (min 44×44px Touchziel)
        ============================================================ */
     .btn {
@@ -1125,79 +1195,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
     </div>
 
-    <!-- Diese Woche – Statistik -->
-    <div class="card">
-      <div class="feature-header" style="margin-bottom:1rem;">
-        <div class="card-title" style="margin-bottom:0;">Diese Woche</div>
-        <button class="ref-badge" onclick="toggleRef('ref-stats')" aria-label="Forschungsgrundlage">📖 C1</button>
-      </div>
-      <div class="ref-card hidden" id="ref-stats">
-        <div class="ref-section-label">Abschnitt C1 — Psychologie & Motivation</div>
-        <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die Hilflosigkeit. Eine Striche-Liste, ein abgehakter Tagesplan, eine Prozent-Anzeige am gelernten Stoff. Deshalb braucht das Tool eine prominente Fortschrittsanzeige.»</p>
-        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
-      </div>
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-value" id="statWeekPom">0</span>
-          <span class="stat-label">Pomodoros gesamt</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="statTodayPom">0</span>
-          <span class="stat-label">Heute</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="statTopics">0</span>
-          <span class="stat-label">Themen ≥ «kann ich»</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Heutige Aufgaben -->
-    <div class="card">
-      <div class="flex-between" style="margin-bottom:0.5rem;">
-        <div class="card-title" style="margin-bottom:0;">Heutige Aufgaben</div>
-        <div style="display:flex;gap:0.4rem;align-items:center;">
-          <button class="ref-badge" onclick="toggleRef('ref-tasks')" aria-label="Forschungsgrundlage">📖 A6</button>
-          <button class="btn btn-outline btn-sm" onclick="toggleAddTask()">+ Aufgabe</button>
-        </div>
-      </div>
-      <div class="ref-card hidden" id="ref-tasks">
-        <div class="ref-section-label">Abschnitt A6 — 48h-Sofortmassnahmen</div>
-        <p class="ref-quote">«Eine «Heute-Karte» bauen. Maximal 3 Aufgaben pro Tag, jeweils mit Zeit (z.B. «Bio: Zellatmung Skript S. 12–18 lesen + 5 Karteikarten, 60 Min.»). Mehr ist Selbstbetrug.»</p>
-        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
-      </div>
-      <div id="taskList"></div>
-      <div class="add-task-form hidden" id="addTaskForm">
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label" for="newTaskSubject">Fach</label>
-            <select id="newTaskSubject">
-              <option>Deutsch</option><option>Englisch</option>
-              <option>Mathematik</option><option>Biologie</option>
-              <option>Chemie</option><option>Physik</option>
-              <option>Geografie</option><option>Geschichte</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label" for="newTaskPomodoros">Pomodoros</label>
-            <input type="number" id="newTaskPomodoros" value="2" min="1" max="10">
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label" for="newTaskTopic">Thema / Aufgabe</label>
-          <!-- Bug #11: isComposing verhindert Doppel-Submit bei Autocomplete; Bug #12: maxlength -->
-          <input type="text" id="newTaskTopic" placeholder="z.B. Zellatmung S. 12–18 lesen + 5 Karteikarten"
-                 maxlength="120"
-                 onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();addTask();}">
-        </div>
-        <div class="flex-gap">
-          <button class="btn btn-primary" onclick="addTask()">Hinzufügen</button>
-          <button class="btn btn-outline" onclick="toggleAddTask()">Abbrechen</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pomodoro-Timer -->
+    <!-- ═══ HERO: Pomodoro-Timer (immer sichtbar) ═══ -->
     <div class="card" id="pomCard">
       <div class="feature-header" style="margin-bottom:1rem;">
         <div class="card-title" style="margin-bottom:0;">Pomodoro-Timer</div>
@@ -1209,7 +1207,6 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
       </div>
       <div class="pomodoro-container">
-        <!-- SVG-Ring -->
         <div class="pom-ring-wrap" aria-hidden="true">
           <svg class="pom-ring-svg" width="180" height="180" viewBox="0 0 180 180">
             <circle class="pom-ring-bg" cx="90" cy="90" r="80"/>
@@ -1221,7 +1218,6 @@ Inhalte anpassen (ohne Programmierkenntnisse):
             <div class="pomodoro-display" id="pomDisplay">25:00</div>
           </div>
         </div>
-        <!-- Flacher Balken (für JS-Kompatibilität, CSS-versteckt) -->
         <div class="pomodoro-progress">
           <div class="pomodoro-progress-bar" id="pomBar" style="width:100%"></div>
         </div>
@@ -1253,37 +1249,146 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       </div>
     </div>
 
-    <!-- Fortschritt je Fach -->
-    <div class="card">
-      <div class="feature-header" style="margin-bottom:1rem;">
-        <div class="card-title" style="margin-bottom:0;">Fortschritt je Fach (Pflicht-Themen)</div>
-        <button class="ref-badge" onclick="toggleRef('ref-progress')" aria-label="Forschungsgrundlage">📖 C1</button>
+    <!-- ═══ ACCORDION: Zusammenklappbare Sektionen ═══ -->
+
+    <!-- Accordion: Heutige Aufgaben -->
+    <div class="accordion-section" id="acc-tasks">
+      <div class="accordion-header" onclick="toggleAccordion('acc-tasks')" role="button" tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAccordion('acc-tasks');}">
+        <div class="accordion-header-left">
+          <span class="accordion-title">Heutige Aufgaben</span>
+          <span class="accordion-badge" id="badge-tasks">0 Aufgaben</span>
+          <button class="ref-badge" onclick="event.stopPropagation();toggleRef('ref-tasks')" aria-label="Forschungsgrundlage">📖 A6</button>
+        </div>
+        <span class="accordion-chevron" aria-hidden="true">&#9662;</span>
       </div>
-      <div class="ref-card hidden" id="ref-progress">
-        <div class="ref-section-label">Abschnitt C1 — Warum Fortschrittsanzeige?</div>
-        <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die erlernte Hilflosigkeit. Pro Fach ein Balken mit dem Anteil A-Themen die auf «kann ich» oder höher stehen. Kein Vergleich mit einem theoretischen Maximum (das demoralisiert) — nur die eigene Entwicklung.»</p>
-        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner">
+          <div class="ref-card hidden" id="ref-tasks">
+            <div class="ref-section-label">Abschnitt A6 — 48h-Sofortmassnahmen</div>
+            <p class="ref-quote">«Eine «Heute-Karte» bauen. Maximal 3 Aufgaben pro Tag, jeweils mit Zeit (z.B. «Bio: Zellatmung Skript S. 12–18 lesen + 5 Karteikarten, 60 Min.»). Mehr ist Selbstbetrug.»</p>
+            <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+          </div>
+          <div style="text-align:right;margin-bottom:0.5rem;">
+            <button class="btn btn-outline btn-sm" onclick="toggleAddTask()">+ Aufgabe</button>
+          </div>
+          <div id="taskList"></div>
+          <div class="add-task-form hidden" id="addTaskForm">
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="newTaskSubject">Fach</label>
+                <select id="newTaskSubject">
+                  <option>Deutsch</option><option>Englisch</option>
+                  <option>Mathematik</option><option>Biologie</option>
+                  <option>Chemie</option><option>Physik</option>
+                  <option>Geografie</option><option>Geschichte</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="newTaskPomodoros">Pomodoros</label>
+                <input type="number" id="newTaskPomodoros" value="2" min="1" max="10">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="newTaskTopic">Thema / Aufgabe</label>
+              <input type="text" id="newTaskTopic" placeholder="z.B. Zellatmung S. 12–18 lesen + 5 Karteikarten"
+                     maxlength="120"
+                     onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();addTask();}">
+            </div>
+            <div class="flex-gap">
+              <button class="btn btn-primary" onclick="addTask()">Hinzufügen</button>
+              <button class="btn btn-outline" onclick="toggleAddTask()">Abbrechen</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="progressBars"></div>
     </div>
 
-    <!-- Mini-Erfolge -->
-    <div class="card">
-      <div class="feature-header" style="margin-bottom:1rem;">
-        <div class="card-title" style="margin-bottom:0;">Mini-Erfolge heute</div>
-        <button class="ref-badge" onclick="toggleRef('ref-journal')" aria-label="Forschungsgrundlage">📖 C4</button>
+    <!-- Accordion: Diese Woche (Statistik) -->
+    <div class="accordion-section" id="acc-stats">
+      <div class="accordion-header" onclick="toggleAccordion('acc-stats')" role="button" tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAccordion('acc-stats');}">
+        <div class="accordion-header-left">
+          <span class="accordion-title">Diese Woche</span>
+          <span class="accordion-badge" id="badge-stats">0 Pomodoros</span>
+          <button class="ref-badge" onclick="event.stopPropagation();toggleRef('ref-stats')" aria-label="Forschungsgrundlage">📖 C1</button>
+        </div>
+        <span class="accordion-chevron" aria-hidden="true">&#9662;</span>
       </div>
-      <div class="ref-card hidden" id="ref-journal">
-        <div class="ref-section-label">Abschnitt C4 — Wie man trotz Rückstand Boden gewinnt</div>
-        <p class="ref-quote">«Tägliche Mikro-Erfolge dokumentieren. Ein Notizbuch oder das HTML-Tool: jeden Abend drei Zeilen «Heute gelernt: …». Nach zwei Wochen sichtbare Beweise gegen das Gefühl der Stagnation.»</p>
-        <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner">
+          <div class="ref-card hidden" id="ref-stats">
+            <div class="ref-section-label">Abschnitt C1 — Psychologie & Motivation</div>
+            <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die Hilflosigkeit. Eine Striche-Liste, ein abgehakter Tagesplan, eine Prozent-Anzeige am gelernten Stoff. Deshalb braucht das Tool eine prominente Fortschrittsanzeige.»</p>
+            <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-item">
+              <span class="stat-value" id="statWeekPom">0</span>
+              <span class="stat-label">Pomodoros gesamt</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="statTodayPom">0</span>
+              <span class="stat-label">Heute</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="statTopics">0</span>
+              <span class="stat-label">Themen ≥ «kann ich»</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="display:grid; gap:0.5rem; margin-bottom:0.75rem;">
-        <textarea id="journalToday" placeholder="Was habe ich heute gelernt? Drei Sätze reichen." rows="3"
-                  aria-label="Heutiger Lernrückblick"></textarea>
-        <button class="btn btn-success" onclick="saveJournal()">Eintrag speichern</button>
+    </div>
+
+    <!-- Accordion: Fortschritt je Fach -->
+    <div class="accordion-section" id="acc-progress">
+      <div class="accordion-header" onclick="toggleAccordion('acc-progress')" role="button" tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAccordion('acc-progress');}">
+        <div class="accordion-header-left">
+          <span class="accordion-title">Fortschritt je Fach</span>
+          <span class="accordion-badge" id="badge-progress">–</span>
+          <button class="ref-badge" onclick="event.stopPropagation();toggleRef('ref-progress')" aria-label="Forschungsgrundlage">📖 C1</button>
+        </div>
+        <span class="accordion-chevron" aria-hidden="true">&#9662;</span>
       </div>
-      <div id="journalList"></div>
+      <div class="accordion-body">
+        <div class="accordion-body-inner">
+          <div class="ref-card hidden" id="ref-progress">
+            <div class="ref-section-label">Abschnitt C1 — Warum Fortschrittsanzeige?</div>
+            <p class="ref-quote">«Sichtbarer Fortschritt durchbricht die erlernte Hilflosigkeit. Pro Fach ein Balken mit dem Anteil A-Themen die auf «kann ich» oder höher stehen. Kein Vergleich mit einem theoretischen Maximum (das demoralisiert) — nur die eigene Entwicklung.»</p>
+            <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+          </div>
+          <div id="progressBars"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accordion: Mini-Erfolge (Journal) -->
+    <div class="accordion-section" id="acc-journal">
+      <div class="accordion-header" onclick="toggleAccordion('acc-journal')" role="button" tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAccordion('acc-journal');}">
+        <div class="accordion-header-left">
+          <span class="accordion-title">Mini-Erfolge heute</span>
+          <span class="accordion-badge" id="badge-journal">0 Eintr.</span>
+          <button class="ref-badge" onclick="event.stopPropagation();toggleRef('ref-journal')" aria-label="Forschungsgrundlage">📖 C4</button>
+        </div>
+        <span class="accordion-chevron" aria-hidden="true">&#9662;</span>
+      </div>
+      <div class="accordion-body">
+        <div class="accordion-body-inner">
+          <div class="ref-card hidden" id="ref-journal">
+            <div class="ref-section-label">Abschnitt C4 — Wie man trotz Rückstand Boden gewinnt</div>
+            <p class="ref-quote">«Tägliche Mikro-Erfolge dokumentieren. Ein Notizbuch oder das HTML-Tool: jeden Abend drei Zeilen «Heute gelernt: …». Nach zwei Wochen sichtbare Beweise gegen das Gefühl der Stagnation.»</p>
+            <button class="ref-link-btn" onclick="switchTab('grundlage')">→ Vollständige Grundlage lesen</button>
+          </div>
+          <div style="display:grid; gap:0.5rem; margin-bottom:0.75rem;">
+            <textarea id="journalToday" placeholder="Was habe ich heute gelernt? Drei Sätze reichen." rows="3"
+                      aria-label="Heutiger Lernrückblick"></textarea>
+            <button class="btn btn-success" onclick="saveJournal()">Eintrag speichern</button>
+          </div>
+          <div id="journalList"></div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1320,6 +1425,28 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         <button class="btn btn-outline btn-sm" onclick="addTopic()">+ Thema</button>
       </div>
       <div id="topicList"></div>
+    </div>
+
+    <!-- KI-Import -->
+    <div class="card" id="ai-import-card">
+      <div class="card-title">KI-Import</div>
+      <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.6;">
+        Kopiere Lernstoff (z.B. aus einem Skript, einer Themenliste oder einem PDF) in das Textfeld.
+        Die KI erkennt automatisch Fächer, Themen und Wichtigkeitsstufen und fügt sie in deine Triage ein.
+      </p>
+      <div class="form-group" style="margin-bottom:0.75rem;">
+        <label class="form-label" for="aiImportText">Lernstoff einfügen</label>
+        <textarea id="aiImportText" rows="6"
+                  placeholder="z.B.:&#10;Mathematik: Integralrechnung, Vektorgeometrie, Wahrscheinlichkeit&#10;Biologie: Zellatmung, Genetik, Ökologie&#10;&#10;Oder einfach unstrukturierten Text aus deinem Skript einfügen — die KI sortiert es für dich."
+                  aria-label="Lernstoff für KI-Analyse"></textarea>
+      </div>
+      <button class="btn btn-primary" id="aiAnalyzeBtn" onclick="analyzeWithAI()">Analysieren</button>
+      <div id="aiLoading" class="hidden" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:0.85rem;">
+        <div style="margin-bottom:0.4rem;">Analyse läuft...</div>
+        <div class="text-sm">Groq API antwortet normalerweise in 2–5 Sekunden.</div>
+      </div>
+      <div id="aiError" class="hidden" style="margin-top:0.75rem;padding:0.6rem 0.8rem;background:var(--terracotta-10);border-radius:var(--radius-sm);color:var(--terracotta);font-size:0.85rem;"></div>
+      <div id="aiPreview" class="hidden" style="margin-top:1rem;"></div>
     </div>
 
   </div>
@@ -2166,10 +2293,40 @@ function toggleRef(id) {
   card.classList.toggle('hidden');
 }
 
+function toggleAccordion(id) {
+  const section = document.getElementById(id);
+  if (!section) return;
+  const isOpen = section.classList.contains('open');
+  document.querySelectorAll('.accordion-section.open').forEach(s => s.classList.remove('open'));
+  if (!isOpen) section.classList.add('open');
+}
+
+function updateAccordionBadges() {
+  const today = todayISO();
+  const todayTasks = state.tasks.filter(t => t.date === today);
+  const done = todayTasks.filter(t => t.completed).length;
+  const total = todayTasks.length;
+  const el1 = document.getElementById('badge-tasks');
+  if (el1) el1.textContent = total ? done + '/' + total + ' erledigt' : 'Keine';
+
+  const todaySessions = state.sessions.filter(s => s.date === today).length;
+  const el2 = document.getElementById('badge-stats');
+  if (el2) el2.textContent = todaySessions + ' heute';
+
+  let aTotal = 0, aDone = 0;
+  Object.values(state.triage).forEach(topics => {
+    topics.forEach(t => { if (t.level === 'A') { aTotal++; if (t.status >= 2) aDone++; } });
+  });
+  const el3 = document.getElementById('badge-progress');
+  if (el3) el3.textContent = aTotal ? Math.round(aDone / aTotal * 100) + '%' : '–';
+
+  const todayJournals = state.journal.filter(j => j.date === today).length;
+  const el4 = document.getElementById('badge-journal');
+  if (el4) el4.textContent = todayJournals + ' Eintr.';
+}
+
 function downloadApp() {
   const link = document.createElement('a');
-  // Wenn online auf GitHub Pages: relative URL zur aktuellen HTML-Datei
-  // Wenn bereits lokal: aktuelle Datei herunterladen
   link.href = window.location.protocol === 'file:'
     ? window.location.href
     : 'passerelle_lerntool.html';
@@ -2177,6 +2334,120 @@ function downloadApp() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+// ============================================================
+// KI-IMPORT (Groq via Cloudflare Worker)
+// ============================================================
+const AI_ENDPOINT = 'https://passerelle-ai-proxy.questside.workers.dev';
+let aiParsedData = null;
+
+async function analyzeWithAI() {
+  const text = document.getElementById('aiImportText').value.trim();
+  if (!text) return;
+  const btn = document.getElementById('aiAnalyzeBtn');
+  const loading = document.getElementById('aiLoading');
+  const errorEl = document.getElementById('aiError');
+  const preview = document.getElementById('aiPreview');
+
+  btn.disabled = true;
+  loading.classList.remove('hidden');
+  errorEl.classList.add('hidden');
+  preview.classList.add('hidden');
+
+  try {
+    const res = await fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = data.error || 'Unbekannter Fehler.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (!data.subjects || typeof data.subjects !== 'object') {
+      errorEl.textContent = 'Ungültiges Antwortformat. Bitte erneut versuchen.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    aiParsedData = data;
+    renderAiPreview(data);
+  } catch (e) {
+    errorEl.textContent = 'Keine Verbindung. Im Offline-Modus nicht verfügbar.';
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    loading.classList.add('hidden');
+  }
+}
+
+function renderAiPreview(data) {
+  const preview = document.getElementById('aiPreview');
+  const validSubjects = Object.keys(defaultTriage);
+  let html = '<div style="margin-bottom:0.75rem;font-weight:600;color:var(--text);">Erkannte Themen:</div>';
+  let total = 0;
+
+  for (const [subj, topics] of Object.entries(data.subjects)) {
+    if (!validSubjects.includes(subj) || !Array.isArray(topics)) continue;
+    html += `<div style="margin-bottom:0.75rem;">`;
+    html += `<div style="font-weight:600;font-size:0.85rem;color:var(--green);margin-bottom:0.3rem;">${subj}</div>`;
+    for (const topic of topics) {
+      if (!topic.name) continue;
+      const exists = (state.triage[subj] || []).some(t => t.name.toLowerCase() === topic.name.toLowerCase());
+      const lvl = ['A','B','C'].includes(topic.level) ? topic.level : 'B';
+      const id = 'ai-' + total;
+      const lvlColor = lvl === 'A' ? 'var(--green)' : lvl === 'B' ? 'var(--yellow)' : 'var(--gray)';
+      html += `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;font-size:0.85rem;cursor:pointer;">`;
+      html += `<input type="checkbox" id="${id}" data-subj="${subj}" data-name="${topic.name}" data-level="${lvl}" ${exists ? '' : 'checked'}>`;
+      html += `<span style="color:${lvlColor};font-weight:600;min-width:1.2rem;">${lvl}</span>`;
+      html += `<span>${topic.name}</span>`;
+      if (exists) html += `<span style="font-size:0.75rem;color:var(--text-light);">(vorhanden)</span>`;
+      html += `</label>`;
+      total++;
+    }
+    html += `</div>`;
+  }
+
+  if (total === 0) {
+    html += '<p class="text-sm text-light">Keine Themen erkannt. Versuche einen ausführlicheren Text.</p>';
+  } else {
+    html += `<button class="btn btn-success" onclick="mergeAiResults()" style="margin-top:0.5rem;">Ausgewählte übernehmen (${total})</button>`;
+  }
+
+  preview.innerHTML = html;
+  preview.classList.remove('hidden');
+}
+
+function mergeAiResults() {
+  const checkboxes = document.querySelectorAll('#aiPreview input[type="checkbox"]:checked');
+  let added = 0;
+  checkboxes.forEach(cb => {
+    const subj = cb.dataset.subj;
+    const name = cb.dataset.name;
+    const level = cb.dataset.level;
+    if (!state.triage[subj]) state.triage[subj] = [];
+    const exists = state.triage[subj].some(t => t.name.toLowerCase() === name.toLowerCase());
+    if (!exists) {
+      state.triage[subj].push({ id: uid(), name, level, status: 0 });
+      added++;
+    }
+  });
+  save();
+  renderTopics();
+  renderSubjectTabs();
+  renderProgressBars();
+  updateAccordionBadges();
+  const preview = document.getElementById('aiPreview');
+  if (added > 0) {
+    preview.innerHTML = `<div style="padding:0.6rem 0.8rem;background:var(--green-10);border-radius:var(--radius-sm);color:var(--green);font-size:0.85rem;font-weight:600;">${added} Themen hinzugefügt!</div>`;
+    setTimeout(() => { preview.classList.add('hidden'); preview.innerHTML = ''; }, 3000);
+  } else {
+    preview.classList.add('hidden');
+  }
+  document.getElementById('aiImportText').value = '';
+  aiParsedData = null;
 }
 
 // ============================================================
@@ -3045,6 +3316,7 @@ function renderAll() {
   if (!pom.running) initPom();
   document.getElementById('pomDuration').value = state.settings.pomDur;
   document.getElementById('pomBreakDur').value = state.settings.pomBreak;
+  updateAccordionBadges();
 }
 
 // ============================================================
