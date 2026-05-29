@@ -1476,8 +1476,8 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <button class="ref-link-btn" onclick="showTips()">→ Vollständige Grundlage lesen</button>
     </div>
 
-    <!-- Rotierender "Wusstest du schon?"-Tipp → öffnet Tipps und Tricks -->
-    <button class="dyk-strip" id="dykStrip" onclick="showTips()" aria-label="Tipps und Tricks öffnen">
+    <!-- Rotierender "Wusstest du schon?"-Tipp — Ziel je nach Tipp -->
+    <button class="dyk-strip" id="dykStrip" onclick="dykAction()" aria-label="Mehr erfahren">
       <span class="dyk-icon">💡</span>
       <span class="dyk-text"><strong>Wusstest du schon?</strong> <span id="dykText">…</span></span>
       <span class="dyk-more">mehr →</span>
@@ -3313,23 +3313,29 @@ function nextMotivation() {
   save();
 }
 
-// "Wusstest du schon?" – rotierende Mini-Tipps aus der Forschungsgrundlage
+// "Wusstest du schon?" – rotierende Mini-Tipps mit je eigenem Linkziel
 const didYouKnowTips = [
-  'Motivation kommt NACH der ersten kleinen Handlung — nicht davor. Fang mit einer einzigen Karteikarte an.',
-  'Aktives Abrufen (Karteikarten, Selbsttest) schlägt passives Wiederlesen um Längen. Nutze den Üben-Tab.',
-  'Verteiltes Lernen über Wochen schlägt Marathon-Sessions. Lieber täglich 3 Pomodoros als am Sonntag zwölf.',
-  'Priorisiere A-Themen (Pflicht) zuerst. Die Stoff-Triage zeigt dir, wo du stehst.',
-  'Ein 25-Minuten-Pomodoro mit Pause hält die Konzentration länger hoch als stundenlanges Durchlernen.',
-  'Der Wochenrückblick (3 Fragen) verhindert, dass du dieselben Fehler Woche für Woche wiederholst.',
-  'Selbsteinschätzung 1–5 pro Fach macht aus Bauchgefühl eine Lernkarte. Ohne sie ist jede Lernsekunde Raten.',
+  { text: 'Motivation kommt NACH der ersten kleinen Handlung — nicht davor. Fang mit einer einzigen Karteikarte an.', action: 'ueben' },
+  { text: 'Aktives Abrufen (Karteikarten, Selbsttest) schlägt passives Wiederlesen um Längen.', action: 'ueben' },
+  { text: 'Verteiltes Lernen über Wochen schlägt Marathon-Sessions. Lieber täglich 3 Pomodoros als am Sonntag zwölf.', action: 'tips' },
+  { text: 'Priorisiere A-Themen (Pflicht) zuerst. Die Stoff-Triage zeigt dir, wo du stehst.', action: 'stoff' },
+  { text: 'Ein 25-Minuten-Pomodoro mit Pause hält die Konzentration länger hoch als stundenlanges Durchlernen.', action: 'tips' },
+  { text: 'Der Wochenrückblick (3 Fragen) verhindert, dass du dieselben Fehler Woche für Woche wiederholst.', action: 'rueckblick' },
+  { text: 'Selbsteinschätzung 1–5 pro Fach macht aus Bauchgefühl eine Lernkarte. Ohne sie ist jede Lernsekunde Raten.', action: 'rueckblick' },
 ];
 
 function renderDidYouKnow() {
   const el = document.getElementById('dykText');
   if (!el) return;
-  // Tipp des Tages: stabil pro Tag, rotiert über die Woche
   const day = Math.floor(Date.now() / 86400000);
-  el.textContent = didYouKnowTips[day % didYouKnowTips.length];
+  el.textContent = didYouKnowTips[day % didYouKnowTips.length].text;
+}
+
+function dykAction() {
+  const day = Math.floor(Date.now() / 86400000);
+  const tip = didYouKnowTips[day % didYouKnowTips.length];
+  if (tip.action === 'tips') showTips();
+  else switchTab(tip.action);
 }
 
 // ============================================================
