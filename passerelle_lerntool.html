@@ -1643,27 +1643,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
        ============================================================ -->
   <div id="panel-stoff" class="panel" role="tabpanel">
 
-    <div class="card" style="margin-bottom:1rem;">
-      <div class="feature-header" style="margin-bottom:0.75rem;">
-        <div class="card-title" style="margin-bottom:0;">Stoff-Triage</div>
-        <button class="ref-badge" onclick="toggleRef('ref-triage')" aria-label="Forschungsgrundlage">📖 B1</button>
-      </div>
-      <div class="ref-card hidden" id="ref-triage">
-        <div class="ref-section-label">Abschnitt B1 — Triage-Matrix</div>
-        <p class="ref-quote">«Stufe A (Pflicht): In SBFI-Richtlinien explizit genannt + in mind. 2 der letzten 4 Prüfungen vorgekommen → 60% Lernzeit. Stufe B (Wichtig): In Richtlinien genannt, aber nicht jährlich geprüft → 30%. Stufe C (Optional): Im Lehrmittel, aber nicht in Richtlinien → 10%. X (Streichen): Im Lehrmittel UND nicht in Richtlinien UND nicht in alten Prüfungen → 0%.»</p>
-        <button class="ref-link-btn" onclick="showTips()">→ Vollständige Grundlage lesen</button>
-      </div>
-      <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.7;">
-        <strong style="color:var(--green);">A</strong> = Pflicht (SBFI + alte Prüfungen) &nbsp;·&nbsp;
-        <strong style="color:var(--yellow);">B</strong> = Wichtig &nbsp;·&nbsp;
-        <strong style="color:var(--gray);">C</strong> = Optional &nbsp;·&nbsp;
-        <strong style="color:var(--terracotta);">X</strong> = Streichen<br>
-        Status: ○ nicht angefangen &nbsp;→&nbsp; ▷ in Bearbeitung &nbsp;→&nbsp; ✓ kann ich &nbsp;→&nbsp; ★ sitzt sicher<br>
-        Stufe und Status anklicken zum Durchschalten.
-      </p>
-    </div>
-
-    <!-- KI-Import — bewusst VOR der Themenliste, damit man nicht erst scrollen muss -->
+    <!-- KI-Import -->
     <div class="card" id="ai-import-card" style="margin-bottom:1rem;">
       <div class="card-title">KI-Import<span class="ki-badge">✦ KI</span></div>
       <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.6;">
@@ -1685,8 +1665,25 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div id="aiPreview" class="hidden" style="margin-top:1rem;"></div>
     </div>
 
-    <!-- Themenverwaltung (Fach-Pillen + Themen zusammen) -->
+    <!-- Stoff-Triage: Legende + Fach-Pillen + Themenliste — alles in einer Card -->
     <div class="card">
+      <div class="feature-header" style="margin-bottom:0.6rem;">
+        <div class="card-title" style="margin-bottom:0;">Stoff-Triage</div>
+        <button class="ref-badge" onclick="toggleRef('ref-triage')" aria-label="Forschungsgrundlage">📖 B1</button>
+      </div>
+      <div class="ref-card hidden" id="ref-triage">
+        <div class="ref-section-label">Abschnitt B1 — Triage-Matrix</div>
+        <p class="ref-quote">«Stufe A (Pflicht): In SBFI-Richtlinien explizit genannt + in mind. 2 der letzten 4 Prüfungen vorgekommen → 60% Lernzeit. Stufe B (Wichtig): In Richtlinien genannt, aber nicht jährlich geprüft → 30%. Stufe C (Optional): Im Lehrmittel, aber nicht in Richtlinien → 10%. X (Streichen): Im Lehrmittel UND nicht in Richtlinien UND nicht in alten Prüfungen → 0%.»</p>
+        <button class="ref-link-btn" onclick="showTips()">→ Vollständige Grundlage lesen</button>
+      </div>
+      <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.7;">
+        <strong style="color:var(--green);">A</strong> = Pflicht (SBFI + alte Prüfungen) &nbsp;·&nbsp;
+        <strong style="color:var(--yellow);">B</strong> = Wichtig &nbsp;·&nbsp;
+        <strong style="color:var(--gray);">C</strong> = Optional &nbsp;·&nbsp;
+        <strong style="color:var(--terracotta);">X</strong> = Streichen<br>
+        Status: ○ nicht angefangen &nbsp;→&nbsp; ▷ in Bearbeitung &nbsp;→&nbsp; ✓ kann ich &nbsp;→&nbsp; ★ sitzt sicher<br>
+        Stufe und Status anklicken zum Durchschalten.
+      </p>
       <div class="subject-tabs" id="subjectTabs" role="tablist" aria-label="Fächer" style="margin-bottom:1rem;"></div>
       <div class="flex-between" style="margin-bottom:1rem;">
         <div id="triageSubjectTitle" class="card-title" style="margin-bottom:0;"></div>
