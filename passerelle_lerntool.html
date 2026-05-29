@@ -369,6 +369,21 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       letter-spacing: -0.01em;
       color: var(--text);
     }
+    .greeting-edit {
+      margin-top: 0.5rem;
+      background: none;
+      border: none;
+      color: var(--text-xlight);
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      opacity: 0.6;
+      transition: opacity var(--transition), color var(--transition);
+      min-height: 32px;
+    }
+    .greeting-edit:hover { opacity: 1; color: var(--blue); }
 
     /* Motivationsbox */
     .motivation-box {
@@ -1156,6 +1171,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <div class="greeting">
       <div class="greeting-date" id="greetingDate"></div>
       <div class="greeting-title" id="greetingTitle">Guten Morgen!</div>
+      <button class="greeting-edit" onclick="showOnboarding()" aria-label="Name und Prüfungsdatum bearbeiten">✎ Profil bearbeiten</button>
     </div>
 
     <!-- Prüfungs-Countdown -->
@@ -1989,6 +2005,34 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 </div>
 
 <!-- ============================================================
+     ONBOARDING-OVERLAY (Erster Besuch)
+     ============================================================ -->
+<div class="overlay hidden" id="onboardingOverlay" role="dialog" aria-modal="true" aria-label="Willkommen">
+  <div class="overlay-card" style="text-align:left;">
+    <div style="text-align:center;">
+      <div style="font-size:2rem;margin-bottom:0.3rem;">🌱</div>
+      <div class="overlay-title">Willkommen bei deinem Lerntool</div>
+      <div class="overlay-sub">Lass uns kurz einrichten. Das dauert nur 20 Sekunden.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="onboardingName">Wie heisst du?</label>
+      <input type="text" id="onboardingName" placeholder="Dein Vorname" maxlength="30" autocomplete="given-name"
+             onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();document.getElementById('onboardingDate').focus();}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="onboardingDate">Wann ist deine Passerelle-Prüfung?</label>
+      <input type="date" id="onboardingDate" style="width:100%;">
+    </div>
+
+    <div id="onboardingError" class="hidden" style="color:var(--terracotta);font-size:0.82rem;margin-bottom:0.75rem;"></div>
+
+    <button class="btn btn-primary full-width" onclick="completeOnboarding()">Los geht's →</button>
+  </div>
+</div>
+
+<!-- ============================================================
      JAVASCRIPT – APP LOGIK
      ============================================================ -->
 <script>
@@ -2122,7 +2166,7 @@ let state = {
   sessions:  [],
   journal:   [],
   reviews:   [],
-  settings:  { pomDur: 25, pomBreak: 5, pruefungsDatum: '' },
+  settings:  { pomDur: 25, pomBreak: 5, pruefungsDatum: '', name: '' },
   motIndex:  0,
   // Notentracker: Selbsteinschätzung 1–6 pro Fach (null = noch nicht gesetzt)
   noten: { Deutsch: null, Englisch: null, Mathematik: null, Biologie: null, Chemie: null, Physik: null, Geografie: null, Geschichte: null },
@@ -2453,15 +2497,82 @@ function mergeAiResults() {
 // ============================================================
 // BEGRÜSSUNG
 // ============================================================
+// Begrüssung wird einmal pro Seitenaufruf gewählt (variiert wie bei Claude),
+// damit sie nicht bei jedem 60s-Intervall neu würfelt.
+let cachedGreeting = null;
+function pickGreeting() {
+  const name = (state.settings.name || '').trim();
+  const h = new Date().getHours();
+  if (!name) {
+    return h < 12 ? 'Guten Morgen!' : h < 18 ? 'Guten Nachmittag!' : 'Guten Abend!';
+  }
+  const morning = [
+    `Guten Morgen, ${name}!`,
+    `Hallo ${name}, bereit für heute?`,
+    `${name}, was möchtest du heute lernen?`,
+    `Schön, dass du da bist, ${name}.`,
+  ];
+  const day = [
+    `Hallo ${name}!`,
+    `Willkommen zurück, ${name}.`,
+    `${name}, was möchtest du heute lernen?`,
+    `Schön, dass du da bist, ${name}.`,
+    `Weiter geht's, ${name}.`,
+  ];
+  const evening = [
+    `Guten Abend, ${name}.`,
+    `Hallo ${name}, noch eine kleine Runde?`,
+    `${name}, jeder Schritt zählt.`,
+    `Schön, dass du da bist, ${name}.`,
+  ];
+  const pool = h < 12 ? morning : h < 18 ? day : evening;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 function renderGreeting() {
   const now = new Date();
-  const h = now.getHours();
-  const greet = h < 12 ? 'Guten Morgen!' : h < 18 ? 'Guten Nachmittag!' : 'Guten Abend!';
   const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
   const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   document.getElementById('greetingDate').textContent =
     `${days[now.getDay()]}, ${now.getDate()}. ${months[now.getMonth()]} ${now.getFullYear()}`;
-  document.getElementById('greetingTitle').textContent = greet;
+  if (cachedGreeting === null) cachedGreeting = pickGreeting();
+  document.getElementById('greetingTitle').textContent = cachedGreeting;
+}
+
+// ============================================================
+// ONBOARDING (Erster Besuch: Name + Prüfungsdatum)
+// ============================================================
+function showOnboarding() {
+  const ov = document.getElementById('onboardingOverlay');
+  if (!ov) return;
+  // Bestehende Werte vorbefüllen (falls Profil später bearbeitet wird)
+  document.getElementById('onboardingName').value = state.settings.name || '';
+  document.getElementById('onboardingDate').value = state.settings.pruefungsDatum || '';
+  document.getElementById('onboardingError').classList.add('hidden');
+  ov.classList.remove('hidden');
+  setTimeout(() => document.getElementById('onboardingName').focus(), 100);
+}
+function completeOnboarding() {
+  const name = document.getElementById('onboardingName').value.trim();
+  const date = document.getElementById('onboardingDate').value;
+  const err = document.getElementById('onboardingError');
+  if (!name) {
+    err.textContent = 'Bitte gib deinen Namen ein.';
+    err.classList.remove('hidden');
+    document.getElementById('onboardingName').focus();
+    return;
+  }
+  if (!date) {
+    err.textContent = 'Bitte wähle dein Prüfungsdatum.';
+    err.classList.remove('hidden');
+    document.getElementById('onboardingDate').focus();
+    return;
+  }
+  state.settings.name = name;
+  state.settings.pruefungsDatum = date;
+  cachedGreeting = null; // neu würfeln mit Namen
+  save();
+  document.getElementById('onboardingOverlay').classList.add('hidden');
+  renderAll();
 }
 
 // ============================================================
@@ -3324,6 +3435,8 @@ function renderAll() {
 // ============================================================
 loadFromStorage();
 renderAll();
+// Erster Besuch: Name + Prüfungsdatum abfragen
+if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
 
 // ============================================================
