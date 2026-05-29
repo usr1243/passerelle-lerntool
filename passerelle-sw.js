@@ -1,30 +1,26 @@
 // ============================================================
 // SERVICE WORKER – Passerelle Lerntool
 // ============================================================
-// Was dieser Service Worker tut:
-//   1. Beim ersten Öffnen: speichert die App-Datei lokal
-//   2. Danach: lädt die App IMMER vom Gerät (nicht vom Internet)
-//   3. Update: prüft im Hintergrund ob es eine neue Version gibt
+// Strategie: NETWORK-FIRST
+//   Online  → immer neueste Version vom Server; Cache wird aktualisiert
+//   Offline → Fallback auf lokal gespeicherte Version
 //
-// Resultat:
-//   - App öffnet sich auch ohne Internet
-//   - Daten (localStorage) bleiben beim iOS-App-Modus in einer
-//     eigenen Sandbox — unabhängig von Safari
+// Dadurch muss man nie mehr den Cache manuell löschen.
 // ============================================================
 
-const CACHE_VERSION = 'passerelle-v1';
+const CACHE_VERSION = 'passerelle-v3';
 const APP_SHELL = './passerelle_lerntool.html';
 
-// INSTALL ── App-Datei lokal speichern
+// INSTALL ── App-Datei lokal speichern + sofort aktivieren
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_VERSION).then((cache) => {
       return cache.add(APP_SHELL);
-    }).then(() => self.skipWaiting())
+    }).then(() => self.skipWaiting())  // Alten SW sofort ersetzen
   );
 });
 
-// ACTIVATE ── Alte Cache-Versionen aufräumen
+// ACTIVATE ── Alle alten Cache-Versionen löschen
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -33,36 +29,35 @@ self.addEventListener('activate', (event) => {
           .filter((key) => key !== CACHE_VERSION)
           .map((key) => caches.delete(key))
       )
-    ).then(() => self.clients.claim())
+    ).then(() => self.clients.claim())  // Alle offenen Tabs übernehmen
   );
 });
 
-// FETCH ── Cache-first mit Hintergrund-Update
+// FETCH ── Network-First: online immer frisch vom Server
 self.addEventListener('fetch', (event) => {
-  // Nur GET-Requests behandeln
   if (event.request.method !== 'GET') return;
 
-  // Nur eigene App-Requests (nicht Google Fonts etc.)
   const url = new URL(event.request.url);
-  const isAppFile = url.pathname.includes('passerelle_lerntool');
+  const isAppFile = url.pathname.includes('passerelle_lerntool')
+                 || url.pathname.includes('passerelle-sw');
 
   if (isAppFile) {
-    // Cache-First: zuerst lokale Kopie, im Hintergrund update prüfen
     event.respondWith(
-      caches.open(CACHE_VERSION).then((cache) => {
-        return cache.match(event.request).then((cached) => {
-          const networkFetch = fetch(event.request).then((response) => {
-            if (response && response.status === 200) {
+      fetch(event.request)
+        .then((response) => {
+          // Neue Version im Cache ablegen
+          if (response && response.status === 200) {
+            caches.open(CACHE_VERSION).then((cache) => {
               cache.put(event.request, response.clone());
-            }
-            return response;
-          }).catch(() => cached); // Kein Internet: nutze Cache
-
-          // Sofort aus Cache laden (kein Warten auf Netzwerk)
-          return cached || networkFetch;
-        });
-      })
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Kein Internet → gespeicherte Version als Fallback
+          return caches.match(event.request);
+        })
     );
   }
-  // Andere Requests (Fonts etc.) normal durchlassen
+  // Alles andere (externe APIs etc.) normal durchlassen
 });
