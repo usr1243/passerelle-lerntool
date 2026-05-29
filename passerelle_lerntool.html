@@ -750,6 +750,48 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .st-2 { background: var(--yellow-light);    color: var(--yellow);     border: 1px solid #e8d5a0; }
     .st-3 { background: var(--green-light);     color: var(--green);      border: 1px solid var(--green-mid); }
 
+    /* Verschachtelte Lernziele (Thema → Lernziel → Unter-Lernziel) */
+    .topic-block { border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 0.5rem; background: var(--bg-card); overflow: hidden; }
+    .topic-block .topic-item { border: none; margin-bottom: 0; background: transparent; }
+    .topic-toggle {
+      width: 28px; height: 28px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; cursor: pointer;
+      color: var(--text-light); font-size: 0.7rem;
+      transition: transform var(--transition);
+    }
+    .topic-toggle.open { transform: rotate(90deg); }
+    .lz-count { font-size: 0.7rem; color: var(--text-light); flex-shrink: 0; white-space: nowrap; }
+    .lz-wrap { padding: 0 0.875rem 0.6rem; border-top: 1px dashed var(--border); }
+    .lz-row, .sub-row {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0; font-size: 0.85rem; line-height: 1.4;
+    }
+    .lz-row { padding-left: 0.4rem; }
+    .sub-row { padding-left: 1.6rem; font-size: 0.8rem; color: var(--text-light); }
+    .lz-marker { color: var(--blue); flex-shrink: 0; }
+    .sub-marker { color: var(--text-xlight); flex-shrink: 0; }
+    .lz-text { flex: 1; outline: none; border-radius: 4px; padding: 0.1rem 0.25rem; overflow-wrap: anywhere; }
+    .lz-text:focus { background: var(--blue-light); box-shadow: 0 0 0 2px var(--blue-mid); }
+    .lz-text[contenteditable="true"]:empty::before { content: attr(data-ph); color: var(--text-xlight); }
+    .lz-btn {
+      width: 26px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card);
+      cursor: pointer; font-size: 0.72rem; color: var(--text-light);
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+    .lz-btn:hover { background: var(--bg-subtle); border-color: var(--border-strong); }
+    .lz-btn.danger:hover { background: var(--terracotta-light); border-color: #f0c0bb; color: var(--terracotta); }
+    .lz-add { display: flex; gap: 0.4rem; align-items: center; margin-top: 0.4rem; }
+    .lz-add.indent { padding-left: 1.6rem; }
+    .lz-add input {
+      flex: 1; font-size: 0.82rem; padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text);
+    }
+    .lz-add input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue-mid); }
+    .lz-empty { font-size: 0.8rem; color: var(--text-light); padding: 0.3rem 0 0.1rem 0.4rem; }
+
     /* ============================================================
        WOCHENPLAN
        ============================================================ */
@@ -2314,8 +2356,26 @@ function loadFromStorage() {
     Object.keys(defaultTriage).forEach(s => {
       if (!state.triage[s]) state.triage[s] = JSON.parse(JSON.stringify(defaultTriage[s]));
     });
+    // Migration: flache Themen (ohne lernziele) auf 3-Ebenen-Modell heben
+    migrateTriage();
     if (!state.weekPlan) state.weekPlan = JSON.parse(JSON.stringify(weekTemplate));
   } catch (e) { console.warn('Laden fehlgeschlagen:', e); }
+}
+
+// Migration: jedes Thema bekommt ein lernziele-Array; jedes Lernziel ein sub-Array.
+function migrateTriage() {
+  if (!state.triage || typeof state.triage !== 'object') return;
+  Object.values(state.triage).forEach(topics => {
+    if (!Array.isArray(topics)) return;
+    topics.forEach(t => {
+      if (!Array.isArray(t.lernziele)) t.lernziele = [];
+      t.lernziele.forEach(lz => {
+        if (lz && !lz.id) lz.id = uid();
+        if (lz && !Array.isArray(lz.sub)) lz.sub = [];
+        (lz.sub || []).forEach(s => { if (s && !s.id) s.id = uid(); });
+      });
+    });
+  });
 }
 
 // ============================================================
@@ -2413,7 +2473,7 @@ async function analyzeWithAI() {
     const res = await fetch(AI_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ mode: 'analyze', text }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -2437,65 +2497,115 @@ async function analyzeWithAI() {
   }
 }
 
+// Liefert die validierten Fach-Einträge in stabiler Reihenfolge (für Index-Pfade).
+function aiValidSubjects(data) {
+  const valid = Object.keys(defaultTriage);
+  return Object.entries(data.subjects)
+    .filter(([subj, topics]) => valid.includes(subj) && Array.isArray(topics));
+}
+
 function renderAiPreview(data) {
   const preview = document.getElementById('aiPreview');
-  const validSubjects = Object.keys(defaultTriage);
-  let html = '<div style="margin-bottom:0.75rem;font-weight:600;color:var(--text);">Erkannte Themen:</div>';
-  let total = 0;
+  const subjects = aiValidSubjects(data);
+  let html = '<div style="margin-bottom:0.75rem;font-weight:600;color:var(--text);">Erkannte Hierarchie:</div>';
+  let topicCount = 0;
 
-  for (const [subj, topics] of Object.entries(data.subjects)) {
-    if (!validSubjects.includes(subj) || !Array.isArray(topics)) continue;
-    html += `<div style="margin-bottom:0.75rem;">`;
-    html += `<div style="font-weight:600;font-size:0.85rem;color:var(--green);margin-bottom:0.3rem;">${subj}</div>`;
-    for (const topic of topics) {
-      if (!topic.name) continue;
+  subjects.forEach(([subj, topics], si) => {
+    const subjTopics = topics.filter(t => t && t.name);
+    if (subjTopics.length === 0) return;
+    html += `<div style="margin-bottom:0.85rem;">`;
+    html += `<div style="font-weight:600;font-size:0.85rem;color:var(--green);margin-bottom:0.3rem;">${esc(subj)}</div>`;
+    topics.forEach((topic, ti) => {
+      if (!topic || !topic.name) return;
+      topicCount++;
       const exists = (state.triage[subj] || []).some(t => t.name.toLowerCase() === topic.name.toLowerCase());
       const lvl = ['A','B','C'].includes(topic.level) ? topic.level : 'B';
-      const id = 'ai-' + total;
-      const lvlColor = lvl === 'A' ? 'var(--green)' : lvl === 'B' ? 'var(--yellow)' : 'var(--gray)';
-      html += `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;font-size:0.85rem;cursor:pointer;">`;
-      html += `<input type="checkbox" id="${id}" data-subj="${subj}" data-name="${topic.name}" data-level="${lvl}" ${exists ? '' : 'checked'}>`;
-      html += `<span style="color:${lvlColor};font-weight:600;min-width:1.2rem;">${lvl}</span>`;
-      html += `<span>${topic.name}</span>`;
-      if (exists) html += `<span style="font-size:0.75rem;color:var(--text-light);">(vorhanden)</span>`;
+      const lvlColor = lvl === 'A' ? 'var(--green)' : lvl === 'B' ? 'var(--yellow)' : 'var(--text-light)';
+      html += `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;font-size:0.85rem;cursor:pointer;font-weight:600;">`;
+      html += `<input type="checkbox" class="ai-cb" data-path="${si}-${ti}" ${exists ? '' : 'checked'}>`;
+      html += `<span style="color:${lvlColor};min-width:1.2rem;">${lvl}</span>`;
+      html += `<span>${esc(topic.name)}</span>`;
+      if (exists) html += `<span style="font-size:0.72rem;color:var(--text-light);font-weight:400;">(vorhanden – ergänzt Lernziele)</span>`;
       html += `</label>`;
-      total++;
-    }
+      const lzArr = Array.isArray(topic.lernziele) ? topic.lernziele : [];
+      lzArr.forEach((lz, li) => {
+        if (!lz || !lz.text) return;
+        html += `<label style="display:flex;align-items:center;gap:0.45rem;padding:0.15rem 0 0.15rem 1.6rem;font-size:0.82rem;cursor:pointer;">`;
+        html += `<input type="checkbox" class="ai-cb" data-path="${si}-${ti}-${li}" checked>`;
+        html += `<span style="color:var(--blue);">▸</span><span>${esc(lz.text)}</span></label>`;
+        const subArr = Array.isArray(lz.sub) ? lz.sub : [];
+        subArr.forEach((s, ssi) => {
+          if (!s || !s.text) return;
+          html += `<label style="display:flex;align-items:center;gap:0.45rem;padding:0.1rem 0 0.1rem 3rem;font-size:0.8rem;color:var(--text-light);cursor:pointer;">`;
+          html += `<input type="checkbox" class="ai-cb" data-path="${si}-${ti}-${li}-${ssi}" checked>`;
+          html += `<span>·</span><span>${esc(s.text)}</span></label>`;
+        });
+      });
+    });
     html += `</div>`;
-  }
+  });
 
-  if (total === 0) {
-    html += '<p class="text-sm text-light">Keine Themen erkannt. Versuche einen ausführlicheren Text.</p>';
+  if (topicCount === 0) {
+    html += '<p class="text-sm text-light">Keine Themen erkannt. Versuche einen ausführlicheren Text mit klaren Lernzielen.</p>';
   } else {
-    html += `<button class="btn btn-success" onclick="mergeAiResults()" style="margin-top:0.5rem;">Ausgewählte übernehmen (${total})</button>`;
+    html += `<button class="btn btn-success" onclick="mergeAiResults()" style="margin-top:0.5rem;">Ausgewählte übernehmen</button>`;
   }
 
   preview.innerHTML = html;
   preview.classList.remove('hidden');
 }
 
+function aiChecked(path) {
+  const cb = document.querySelector(`#aiPreview .ai-cb[data-path="${path}"]`);
+  return !!(cb && cb.checked);
+}
+
 function mergeAiResults() {
-  const checkboxes = document.querySelectorAll('#aiPreview input[type="checkbox"]:checked');
-  let added = 0;
-  checkboxes.forEach(cb => {
-    const subj = cb.dataset.subj;
-    const name = cb.dataset.name;
-    const level = cb.dataset.level;
-    if (!state.triage[subj]) state.triage[subj] = [];
-    const exists = state.triage[subj].some(t => t.name.toLowerCase() === name.toLowerCase());
-    if (!exists) {
-      state.triage[subj].push({ id: uid(), name, level, status: 0 });
-      added++;
-    }
+  if (!aiParsedData) return;
+  const subjects = aiValidSubjects(aiParsedData);
+  let addedTopics = 0, addedLz = 0;
+
+  subjects.forEach(([subj, topics], si) => {
+    topics.forEach((topic, ti) => {
+      if (!topic || !topic.name) return;
+      if (!aiChecked(`${si}-${ti}`)) return;
+      if (!Array.isArray(state.triage[subj])) state.triage[subj] = [];
+      const lvl = ['A','B','C'].includes(topic.level) ? topic.level : 'B';
+      let target = state.triage[subj].find(t => t.name.toLowerCase() === topic.name.toLowerCase());
+      if (!target) {
+        target = { id: uid(), name: topic.name, level: lvl, status: 0, lernziele: [] };
+        state.triage[subj].push(target);
+        addedTopics++;
+      }
+      if (!Array.isArray(target.lernziele)) target.lernziele = [];
+      const lzArr = Array.isArray(topic.lernziele) ? topic.lernziele : [];
+      lzArr.forEach((lz, li) => {
+        if (!lz || !lz.text || !aiChecked(`${si}-${ti}-${li}`)) return;
+        let lzTarget = target.lernziele.find(x => x.text.toLowerCase() === lz.text.toLowerCase());
+        if (!lzTarget) {
+          lzTarget = { id: uid(), text: lz.text, sub: [] };
+          target.lernziele.push(lzTarget);
+          addedLz++;
+        }
+        if (!Array.isArray(lzTarget.sub)) lzTarget.sub = [];
+        const subArr = Array.isArray(lz.sub) ? lz.sub : [];
+        subArr.forEach((s, ssi) => {
+          if (!s || !s.text || !aiChecked(`${si}-${ti}-${li}-${ssi}`)) return;
+          const dup = lzTarget.sub.some(x => x.text.toLowerCase() === s.text.toLowerCase());
+          if (!dup) lzTarget.sub.push({ id: uid(), text: s.text });
+        });
+      });
+    });
   });
+
   save();
   renderTopics();
   renderSubjectTabs();
   renderProgressBars();
   updateAccordionBadges();
   const preview = document.getElementById('aiPreview');
-  if (added > 0) {
-    preview.innerHTML = `<div style="padding:0.6rem 0.8rem;background:var(--green-10);border-radius:var(--radius-sm);color:var(--green);font-size:0.85rem;font-weight:600;">${added} Themen hinzugefügt!</div>`;
+  if (addedTopics > 0 || addedLz > 0) {
+    preview.innerHTML = `<div style="padding:0.6rem 0.8rem;background:var(--green-light);border-radius:var(--radius-sm);color:var(--green);font-size:0.85rem;font-weight:600;">${addedTopics} Themen, ${addedLz} Lernziele übernommen!</div>`;
     setTimeout(() => { preview.classList.add('hidden'); preview.innerHTML = ''; }, 3000);
   } else {
     preview.classList.add('hidden');
@@ -2919,34 +3029,175 @@ function selectSubject(subj) {
   renderTopics();
 }
 
+const expandedTopics = new Set();
+
 function renderTopics() {
   document.getElementById('triageSubjectTitle').textContent = currentSubject;
   const topics = state.triage[currentSubject] || [];
   const el = document.getElementById('topicList');
   if (!topics.length) {
-    el.innerHTML = '<p class="text-light text-sm">Noch keine Themen. Klicke «+ Thema».</p>';
+    el.innerHTML = '<p class="text-light text-sm">Noch keine Themen. Klicke «+ Thema» oder nutze den KI-Import.</p>';
     return;
   }
-  // Bug #7: t.level als CSS-Klasse sanitizen — nur erlaubte Werte durchlassen
   const safeLevel = l => ['A','B','C','X'].includes(l) ? l : 'B';
   const safeStatus = s => [0,1,2,3].includes(s) ? s : 0;
+
   el.innerHTML = topics.map(t => {
     const lvl = safeLevel(t.level);
     const st  = safeStatus(t.status);
+    const lz  = Array.isArray(t.lernziele) ? t.lernziele : [];
+    const open = expandedTopics.has(t.id);
+    const subTotal = lz.reduce((n, x) => n + ((x.sub && x.sub.length) || 0), 0);
+    const countLabel = lz.length ? `${lz.length} LZ${subTotal ? ' · ' + subTotal : ''}` : 'keine LZ';
+
+    let body = '';
+    if (open) {
+      let inner = '';
+      if (lz.length === 0) {
+        inner += `<div class="lz-empty">Noch keine Lernziele. Füge unten welche hinzu.</div>`;
+      }
+      lz.forEach(l => {
+        inner += `
+          <div class="lz-row">
+            <span class="lz-marker">▸</span>
+            <span class="lz-text" contenteditable="true" data-ph="Lernziel…"
+                  onblur="saveLernzielText('${t.id}','${l.id}',this)"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${esc(l.text)}</span>
+            <button class="lz-btn" title="Unter-Lernziel hinzufügen" onclick="focusSubInput('${t.id}','${l.id}')">＋</button>
+            <button class="lz-btn danger" title="Lernziel löschen" onclick="deleteLernziel('${t.id}','${l.id}')">✕</button>
+          </div>`;
+        (l.sub || []).forEach(s => {
+          inner += `
+            <div class="sub-row">
+              <span class="sub-marker">·</span>
+              <span class="lz-text" contenteditable="true" data-ph="Unter-Lernziel…"
+                    onblur="saveSubText('${t.id}','${l.id}','${s.id}',this)"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${esc(s.text)}</span>
+              <button class="lz-btn danger" title="Unter-Lernziel löschen" onclick="deleteSub('${t.id}','${l.id}','${s.id}')">✕</button>
+            </div>`;
+        });
+        inner += `
+          <div class="lz-add indent">
+            <input type="text" id="subInput-${l.id}" placeholder="+ Unter-Lernziel"
+                   onkeydown="if(event.key==='Enter')addSub('${t.id}','${l.id}')">
+            <button class="lz-btn" title="Hinzufügen" onclick="addSub('${t.id}','${l.id}')">＋</button>
+          </div>`;
+      });
+      inner += `
+        <div class="lz-add">
+          <input type="text" id="lzInput-${t.id}" placeholder="+ Lernziel"
+                 onkeydown="if(event.key==='Enter')addLernziel('${t.id}')">
+          <button class="lz-btn" title="Hinzufügen" onclick="addLernziel('${t.id}')">＋</button>
+        </div>`;
+      body = `<div class="lz-wrap">${inner}</div>`;
+    }
+
     return `
-    <div class="topic-item">
-      <div class="topic-level level-${lvl}"
-           onclick="cycleLevel('${t.id}')" role="button" tabindex="0"
-           title="Stufe ändern: A → B → C → X"
-           onkeydown="if(event.key==='Enter')cycleLevel('${t.id}')">${lvl}</div>
-      <div class="topic-name">${esc(t.name)}</div>
-      <div class="topic-status ${statusCls[st]}"
-           onclick="cycleStatus('${t.id}')" role="button" tabindex="0"
-           title="Status ändern" aria-label="Status: ${statusLabels[st]}"
-           onkeydown="if(event.key==='Enter')cycleStatus('${t.id}')">${statusLabels[st]}</div>
-      <button class="btn btn-icon btn-sm" onclick="deleteTopic('${t.id}')" aria-label="Thema löschen">✕</button>
+    <div class="topic-block">
+      <div class="topic-item">
+        <button class="topic-toggle ${open ? 'open' : ''}" onclick="toggleTopicExpand('${t.id}')"
+                aria-label="Lernziele ein-/ausklappen" aria-expanded="${open}">▶</button>
+        <div class="topic-level level-${lvl}"
+             onclick="cycleLevel('${t.id}')" role="button" tabindex="0"
+             title="Stufe ändern: A → B → C → X"
+             onkeydown="if(event.key==='Enter')cycleLevel('${t.id}')">${lvl}</div>
+        <div class="topic-name">${esc(t.name)}</div>
+        <span class="lz-count">${countLabel}</span>
+        <div class="topic-status ${statusCls[st]}"
+             onclick="cycleStatus('${t.id}')" role="button" tabindex="0"
+             title="Status ändern" aria-label="Status: ${statusLabels[st]}"
+             onkeydown="if(event.key==='Enter')cycleStatus('${t.id}')">${statusLabels[st]}</div>
+        <button class="btn btn-icon btn-sm" onclick="deleteTopic('${t.id}')" aria-label="Thema löschen">✕</button>
+      </div>
+      ${body}
     </div>`;
   }).join('');
+}
+
+function toggleTopicExpand(id) {
+  if (expandedTopics.has(id)) expandedTopics.delete(id);
+  else expandedTopics.add(id);
+  renderTopics();
+}
+
+function findTopic(id) {
+  const topics = state.triage[currentSubject];
+  return Array.isArray(topics) ? topics.find(t => t.id === id) : null;
+}
+
+function addLernziel(topicId) {
+  const input = document.getElementById('lzInput-' + topicId);
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const t = findTopic(topicId);
+  if (!t) return;
+  if (!Array.isArray(t.lernziele)) t.lernziele = [];
+  t.lernziele.push({ id: uid(), text, sub: [] });
+  expandedTopics.add(topicId);
+  save(); renderTopics();
+  const again = document.getElementById('lzInput-' + topicId);
+  if (again) again.focus();
+}
+
+function addSub(topicId, lzId) {
+  const input = document.getElementById('subInput-' + lzId);
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const t = findTopic(topicId);
+  if (!t) return;
+  const lz = (t.lernziele || []).find(x => x.id === lzId);
+  if (!lz) return;
+  if (!Array.isArray(lz.sub)) lz.sub = [];
+  lz.sub.push({ id: uid(), text });
+  save(); renderTopics();
+  const again = document.getElementById('subInput-' + lzId);
+  if (again) again.focus();
+}
+
+function focusSubInput(topicId, lzId) {
+  expandedTopics.add(topicId);
+  const input = document.getElementById('subInput-' + lzId);
+  if (input) input.focus();
+}
+
+function saveLernzielText(topicId, lzId, el) {
+  const t = findTopic(topicId);
+  if (!t) return;
+  const lz = (t.lernziele || []).find(x => x.id === lzId);
+  if (!lz) return;
+  const text = el.textContent.trim();
+  if (text && text !== lz.text) { lz.text = text; save(); }
+  else if (!text) { el.textContent = lz.text; } // leer → zurücksetzen
+}
+
+function saveSubText(topicId, lzId, subId, el) {
+  const t = findTopic(topicId);
+  if (!t) return;
+  const lz = (t.lernziele || []).find(x => x.id === lzId);
+  if (!lz) return;
+  const s = (lz.sub || []).find(x => x.id === subId);
+  if (!s) return;
+  const text = el.textContent.trim();
+  if (text && text !== s.text) { s.text = text; save(); }
+  else if (!text) { el.textContent = s.text; }
+}
+
+function deleteLernziel(topicId, lzId) {
+  const t = findTopic(topicId);
+  if (!t || !Array.isArray(t.lernziele)) return;
+  t.lernziele = t.lernziele.filter(x => x.id !== lzId);
+  save(); renderTopics();
+}
+
+function deleteSub(topicId, lzId, subId) {
+  const t = findTopic(topicId);
+  if (!t) return;
+  const lz = (t.lernziele || []).find(x => x.id === lzId);
+  if (!lz || !Array.isArray(lz.sub)) return;
+  lz.sub = lz.sub.filter(x => x.id !== subId);
+  save(); renderTopics();
 }
 
 function cycleLevel(id) {
@@ -2983,7 +3234,7 @@ function deleteTopic(id) {
 function addTopic() {
   const name = prompt('Neues Thema für ' + currentSubject + ':');
   if (name && name.trim()) {
-    state.triage[currentSubject].push({ id: uid(), name: name.trim(), level: 'B', status: 0 });
+    state.triage[currentSubject].push({ id: uid(), name: name.trim(), level: 'B', status: 0, lernziele: [] });
     save(); renderTopics(); renderProgressBars();
   }
 }
@@ -3479,6 +3730,7 @@ function renderAll() {
 // START
 // ============================================================
 loadFromStorage();
+migrateTriage(); // auch für Erstbesucher (Default-Themen) das lernziele-Feld sicherstellen
 renderAll();
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
