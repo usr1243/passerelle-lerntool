@@ -1273,6 +1273,16 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       transition: background 0.15s;
     }
     .ref-badge:hover { background: var(--blue-mid); }
+    /* KI-Feature-Badge */
+    .ki-badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em;
+      background: var(--terracotta-light); color: var(--terracotta);
+      border: 1px solid var(--terracotta); border-radius: 20px;
+      padding: 2px 7px; vertical-align: middle; margin-left: 0.4em;
+      line-height: 1.5; pointer-events: none; white-space: nowrap;
+      font-family: var(--font-sans);
+    }
     .ref-card {
       background: var(--blue-light); border-left: 3px solid var(--blue);
       border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; margin: 0.6rem 0 1rem;
@@ -1641,17 +1651,9 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div class="subject-tabs" id="subjectTabs" role="tablist" aria-label="Fächer"></div>
     </div>
 
-    <div class="card">
-      <div class="flex-between" style="margin-bottom:1rem;">
-        <div id="triageSubjectTitle" class="card-title" style="margin-bottom:0;"></div>
-        <button class="btn btn-outline btn-sm" onclick="addTopic()">+ Thema</button>
-      </div>
-      <div id="topicList"></div>
-    </div>
-
-    <!-- KI-Import -->
-    <div class="card" id="ai-import-card">
-      <div class="card-title">KI-Import</div>
+    <!-- KI-Import — bewusst VOR der Themenliste, damit man nicht erst scrollen muss -->
+    <div class="card" id="ai-import-card" style="margin-bottom:1rem;">
+      <div class="card-title">KI-Import<span class="ki-badge">✦ KI</span></div>
       <p class="text-sm text-light" style="margin-bottom:1rem; line-height:1.6;">
         Kopiere Lernstoff (z.B. aus einem Skript, einer Themenliste oder einem PDF) in das Textfeld.
         Die KI erkennt automatisch Fächer, Themen und Wichtigkeitsstufen und fügt sie in deine Triage ein.
@@ -1662,13 +1664,22 @@ Inhalte anpassen (ohne Programmierkenntnisse):
                   placeholder="z.B.:&#10;Mathematik: Integralrechnung, Vektorgeometrie, Wahrscheinlichkeit&#10;Biologie: Zellatmung, Genetik, Ökologie&#10;&#10;Oder einfach unstrukturierten Text aus deinem Skript einfügen — die KI sortiert es für dich."
                   aria-label="Lernstoff für KI-Analyse"></textarea>
       </div>
-      <button class="btn btn-primary" id="aiAnalyzeBtn" onclick="analyzeWithAI()">Analysieren</button>
+      <button class="btn btn-primary" id="aiAnalyzeBtn" onclick="analyzeWithAI()">Analysieren<span class="ki-badge">✦ KI</span></button>
       <div id="aiLoading" class="hidden" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:0.85rem;">
         <div style="margin-bottom:0.4rem;">Analyse läuft...</div>
         <div class="text-sm">Groq API antwortet normalerweise in 2–5 Sekunden.</div>
       </div>
-      <div id="aiError" class="hidden" style="margin-top:0.75rem;padding:0.6rem 0.8rem;background:var(--terracotta-10);border-radius:var(--radius-sm);color:var(--terracotta);font-size:0.85rem;"></div>
+      <div id="aiError" class="hidden" style="margin-top:0.75rem;padding:0.6rem 0.8rem;background:var(--terracotta-light);border-radius:var(--radius-sm);color:var(--terracotta);font-size:0.85rem;"></div>
       <div id="aiPreview" class="hidden" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- Themenverwaltung -->
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:1rem;">
+        <div id="triageSubjectTitle" class="card-title" style="margin-bottom:0;"></div>
+        <button class="btn btn-outline btn-sm" onclick="addTopic()">+ Thema</button>
+      </div>
+      <div id="topicList"></div>
     </div>
 
   </div>
@@ -1772,10 +1783,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
        ============================================================ -->
   <div id="panel-ueben" class="panel" role="tabpanel">
     <div class="card">
-      <div class="card-title">Üben</div>
-      <p class="text-sm text-light" style="line-height:1.6;margin-bottom:1rem;">
-        Karteikarten und Selbsttests — generiert aus deinen erfassten Lernzielen, auf Passerelle-Niveau.
-      </p>
+      <div class="card-title">Üben<span class="ki-badge">✦ KI</span></div>
+
+      <!-- Erklärung & Voraussetzung -->
+      <div class="onb-tip" style="margin-bottom:1.25rem;">
+        <strong>So funktioniert das Üben:</strong>
+        Wähle ein Fach und ein Thema — die KI generiert daraus
+        Karteikarten oder prüfungsnahe Fragen <em>ausschliesslich</em>
+        aus deinen erfassten Lernzielen, auf Passerelle-Niveau.<br><br>
+        <strong>Voraussetzung:</strong> Gehe zuerst in den Tab
+        <strong>«Stoff»</strong> und erfasse dort Lernziele (per KI-Import
+        oder manuell). Erst dann erscheinen hier Themen zur Auswahl.
+      </div>
 
       <!-- Auswahl -->
       <div class="ueben-grid">
@@ -1798,7 +1817,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         </div>
       </div>
 
-      <button class="btn btn-primary full-width" id="uebenGenBtn" onclick="generateUeben()">Generieren</button>
+      <button class="btn btn-primary full-width" id="uebenGenBtn" onclick="generateUeben()">Generieren<span class="ki-badge">✦ KI</span></button>
       <div id="uebenLoading" class="hidden" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:0.85rem;">
         <div style="margin-bottom:0.4rem;">Wird generiert…</div>
         <div class="text-sm">Die KI braucht meist 3–8 Sekunden.</div>
@@ -2501,7 +2520,7 @@ let state = {
 };
 
 // Pomodoro-Laufzustand (nicht persistiert)
-const pom = { running: false, isBreak: false, timeLeft: 0, total: 0, iv: null };
+const pom = { running: false, isBreak: false, timeLeft: 0, total: 0, iv: null, endAt: null };
 
 let saveTimer = null;
 let currentSubject = 'Deutsch';
@@ -3363,40 +3382,48 @@ function togglePomodoro() {
   pom.running ? pausePom() : startPom();
 }
 
+// Einzelner Timer-Tick — ausgelagert damit visibilitychange ihn wiederverwenden kann
+function pomTick() {
+  pom.timeLeft = Math.max(0, Math.round((pom.endAt - Date.now()) / 1000));
+  updatePomDisplay();
+  if (pom.timeLeft <= 0) {
+    clearInterval(pom.iv);
+    if (!pom.isBreak) {
+      beep(440, 0.4);
+      logSession();
+      pom.isBreak  = true;
+      pom.timeLeft = state.settings.pomBreak * 60;
+      pom.total    = state.settings.pomBreak * 60;
+      pom.endAt    = Date.now() + pom.timeLeft * 1000;
+      document.getElementById('pomLabel').textContent = 'Pause – gut gemacht!';
+      document.getElementById('pomCard').classList.add('is-break');
+      updatePomCounter();
+      renderStats();
+      pom.iv = setInterval(pomTick, 1000);
+    } else {
+      beep(660, 0.25);
+      pom.isBreak  = false;
+      pom.timeLeft = state.settings.pomDur * 60;
+      pom.total    = state.settings.pomDur * 60;
+      document.getElementById('pomLabel').textContent = 'Bereit für die nächste Session';
+      document.getElementById('pomCard').classList.remove('is-break');
+      pausePom();
+      document.getElementById('pomBtn').textContent = '▶ Starten';
+    }
+  }
+}
+
 function startPom() {
   clearInterval(pom.iv);
   pom.running = true;
+  pom.endAt   = Date.now() + pom.timeLeft * 1000;
   document.getElementById('pomBtn').textContent = '⏸ Pause';
-  pom.iv = setInterval(() => {
-    pom.timeLeft--;
-    updatePomDisplay();
-    if (pom.timeLeft <= 0) {
-      if (!pom.isBreak) {
-        beep(440, 0.4);
-        logSession();
-        pom.isBreak  = true;
-        pom.timeLeft = state.settings.pomBreak * 60;
-        pom.total    = state.settings.pomBreak * 60;
-        document.getElementById('pomLabel').textContent = 'Pause – gut gemacht!';
-        document.getElementById('pomCard').classList.add('is-break');
-        updatePomCounter();
-        renderStats();
-      } else {
-        beep(660, 0.25);
-        pom.isBreak  = false;
-        pom.timeLeft = state.settings.pomDur * 60;
-        pom.total    = state.settings.pomDur * 60;
-        document.getElementById('pomLabel').textContent = 'Bereit für die nächste Session';
-        document.getElementById('pomCard').classList.remove('is-break');
-        pausePom();
-        document.getElementById('pomBtn').textContent = '▶ Starten';
-      }
-    }
-  }, 1000);
+  pom.iv = setInterval(pomTick, 1000);
 }
 
 function pausePom() {
   pom.running = false;
+  pom.endAt   = null;
   clearInterval(pom.iv);
   document.getElementById('pomBtn').textContent = '▶ Weiter';
 }
@@ -4285,6 +4312,17 @@ if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
 
 // Tastatursteuerung für den Karteikarten-Lernmodus
+// Korrektur nach Tab-Wechsel / App-Hintergrund (iOS/Safari throttelt setInterval)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && pom.running && pom.endAt) {
+    pom.timeLeft = Math.max(0, Math.round((pom.endAt - Date.now()) / 1000));
+    updatePomDisplay();
+    clearInterval(pom.iv);
+    pom.iv = setInterval(pomTick, 1000);
+    if (pom.timeLeft === 0) setTimeout(pomTick, 50); // Phase sofort abschliessen
+  }
+});
+
 document.addEventListener('keydown', (e) => {
   const fc = document.getElementById('flashcardArea');
   if (!fc || fc.classList.contains('hidden')) return;
