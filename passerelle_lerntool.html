@@ -1001,6 +1001,19 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .onb-date { min-height: 54px; color: var(--text); cursor: pointer; }
     .onb-date::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
     .onb-hint { font-size: 0.78rem; color: var(--text-xlight); margin-top: 0.4rem; }
+    .onb-features {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+    .onb-features li {
+      background: var(--bg-subtle); border-radius: var(--radius);
+      padding: 0.65rem 0.9rem; font-size: 0.88rem; line-height: 1.5;
+      border-left: 3px solid var(--terracotta);
+    }
+    .onb-footnote {
+      font-size: 0.78rem; color: var(--text-xlight);
+      text-align: center; margin-top: 0.85rem; line-height: 1.5;
+    }
     .onb-error { color: var(--terracotta); font-size: 0.85rem; margin-bottom: 0.85rem; font-weight: 600; }
     .onb-error.hidden { display: none; }
     .onb-tip {
@@ -1648,7 +1661,6 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         Status: ○ nicht angefangen &nbsp;→&nbsp; ▷ in Bearbeitung &nbsp;→&nbsp; ✓ kann ich &nbsp;→&nbsp; ★ sitzt sicher<br>
         Stufe und Status anklicken zum Durchschalten.
       </p>
-      <div class="subject-tabs" id="subjectTabs" role="tablist" aria-label="Fächer"></div>
     </div>
 
     <!-- KI-Import — bewusst VOR der Themenliste, damit man nicht erst scrollen muss -->
@@ -1673,8 +1685,9 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <div id="aiPreview" class="hidden" style="margin-top:1rem;"></div>
     </div>
 
-    <!-- Themenverwaltung -->
+    <!-- Themenverwaltung (Fach-Pillen + Themen zusammen) -->
     <div class="card">
+      <div class="subject-tabs" id="subjectTabs" role="tablist" aria-label="Fächer" style="margin-bottom:1rem;"></div>
       <div class="flex-between" style="margin-bottom:1rem;">
         <div id="triageSubjectTitle" class="card-title" style="margin-bottom:0;"></div>
         <button class="btn btn-outline btn-sm" onclick="addTopic()">+ Thema</button>
@@ -2360,14 +2373,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         </div>
       </div>
 
-      <!-- Schritt 3: Tipp zum Start -->
+      <!-- Schritt 3: App-Vorstellung -->
       <div class="onb-slide hidden" id="onbSlide3">
-        <div class="onb-emoji">💡</div>
-        <h1 class="onb-title">Ein Tipp zum Start</h1>
-        <p class="onb-sub">Eine letzte Sache, bevor du loslegst:</p>
-        <div class="onb-tip">
-          Lies dir die <strong>Tipps und Tricks</strong> durch (das 💡 oben rechts). Die ganze App baut auf dieser Forschungsgrundlage auf — sie verrät dir, <em>warum</em> jedes Feature da ist. Ich öffne sie dir gleich automatisch.
-        </div>
+        <div class="onb-emoji">🚀</div>
+        <h1 class="onb-title">Dein persönliches Lern-Cockpit</h1>
+        <p class="onb-sub">Das tut dieses Tool für dich:</p>
+        <ul class="onb-features">
+          <li><strong>Stoff strukturieren</strong> — Priorisiere deinen Lernstoff, damit du weisst, was wirklich zählt</li>
+          <li><strong>Fokussiert lernen</strong> — Basiert auf bewährten Lerntechniken, damit jede Stunde wirklich wirkt</li>
+          <li><strong>Überblick behalten</strong> — Wochenplan, Fortschritt und Reflexion an einem Ort</li>
+          <li><strong>Krisensituationen meistern</strong> — Der rote 🆘-Button hilft, wenn der Kopf voll ist und du nicht mehr kannst</li>
+        </ul>
+        <p class="onb-footnote">Hintergründe und Forschungsgrundlage findest du unter 💡 <em>Tipps und Tricks</em> oben rechts — ich öffne sie dir gleich.</p>
         <div class="onb-nav onb-nav-row">
           <button class="btn btn-outline" onclick="onbBack()">← Zurück</button>
           <button class="btn btn-primary" onclick="completeOnboarding()">Los geht's →</button>
