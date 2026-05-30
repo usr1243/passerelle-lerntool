@@ -1064,6 +1064,21 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       -webkit-overflow-scrolling: touch;
     }
     .tips-overlay.hidden { display: none; }
+    .tips-tab-bar {
+      display: flex; border-bottom: 1px solid var(--border);
+      background: var(--bg-card); position: sticky; top: 52px; z-index: 2;
+      flex-shrink: 0;
+    }
+    .tips-tab-btn {
+      flex: 1; padding: 0.75rem 1rem; border: none; background: none;
+      font-size: 0.88rem; font-weight: 600; color: var(--text-light);
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s; font-family: var(--font-sans);
+    }
+    .tips-tab-btn.active { color: var(--text); border-bottom-color: var(--terracotta); }
+    .tips-tab-btn:hover:not(.active) { color: var(--text); background: var(--bg-subtle); }
+    .tips-tab-panel { display: block; }
+    .tips-tab-panel.hidden { display: none; }
     .tips-overlay-bar {
       position: sticky;
       top: 0;
@@ -1902,7 +1917,13 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <span class="tips-overlay-title">💡 Tipps und Tricks</span>
       <button class="btn btn-outline btn-sm" onclick="closeTips()" aria-label="Schliessen">✕ Schliessen</button>
     </div>
-    <div class="tips-overlay-inner">
+    <div class="tips-tab-bar" role="tablist">
+      <button class="tips-tab-btn active" id="tipsBtnGrundlagen" role="tab" aria-selected="true" onclick="switchTipsTab('grundlagen')">📚 Grundlagen</button>
+      <button class="tips-tab-btn" id="tipsBtnRessourcen" role="tab" aria-selected="false" onclick="switchTipsTab('ressourcen')">🔗 Ressourcen & Kontakt</button>
+    </div>
+
+    <!-- ===== TAB 1: GRUNDLAGEN ===== -->
+    <div id="tipsPanelGrundlagen" class="tips-tab-panel tips-overlay-inner">
 
     <!-- Hero -->
     <div class="gl-hero">
@@ -2118,6 +2139,11 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       </div>
     </div>
 
+    </div><!-- /#tipsPanelGrundlagen -->
+
+    <!-- ===== TAB 2: RESSOURCEN & KONTAKT ===== -->
+    <div id="tipsPanelRessourcen" class="tips-tab-panel tips-overlay-inner hidden">
+
     <!-- Ressourcen & Community -->
     <div class="card gl-section" id="ressourcen-card">
       <div class="gl-label">Ressourcen &amp; Community</div>
@@ -2165,10 +2191,9 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <div class="card gl-section">
       <div class="gl-label">Offline &amp; App-Modus</div>
       <div class="gl-h2">Das Tool immer dabei — auch ohne Internet</div>
-      <p class="gl-p">Es gibt zwei Wege, das Tool lokal zu speichern, damit es unabhängig von der Internetverbindung und von GitHub funktioniert:</p>
+      <p class="gl-p">Speichere das Tool lokal auf deinem iPhone oder iPad — so läuft es wie eine native App, auch ohne Internetverbindung:</p>
 
       <div class="offline-option">
-        <div class="offline-option-num">1</div>
         <div class="offline-option-body">
           <div class="offline-option-title">Als App auf iPhone / iPad installieren</div>
           <div class="offline-option-desc">In Safari öffnen → Teilen-Symbol antippen (Quadrat mit Pfeil) → «Zum Home-Bildschirm» → Hinzufügen. Die App öffnet sich danach ohne Browser-Leiste, wie eine native App. Alle Daten bleiben separat von Safari gespeichert und werden beim Verlauf-Löschen nicht berührt.</div>
@@ -2180,39 +2205,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         </div>
       </div>
 
-      <div class="offline-option">
-        <div class="offline-option-num">2</div>
-        <div class="offline-option-body">
-          <div class="offline-option-title">HTML-Datei herunterladen &amp; lokal speichern</div>
-          <div class="offline-option-desc">Die gesamte App ist eine einzige HTML-Datei. Herunterladen, auf dem Desktop oder in iCloud speichern, und per Doppelklick in jedem Browser öffnen — komplett ohne Internet, ohne Account, ohne Installation. Alle Daten bleiben im Browser-Speicher des Geräts.</div>
-          <div class="offline-option-tags">
-            <span class="resource-tag">Mac / Windows / iPad</span>
-            <span class="resource-tag">Kein Account</span>
-            <span class="resource-tag">Einzelne Datei</span>
-          </div>
-          <button class="btn btn-primary" style="margin-top:0.75rem;" onclick="downloadApp()">⬇ HTML-Datei herunterladen</button>
-        </div>
-      </div>
     </div>
 
     <!-- Kontakt -->
     <div class="card gl-section">
       <div class="gl-label">Kontakt</div>
       <div class="gl-h2">Feedback, Ideen, Fragen?</div>
-      <p class="gl-p">Dieses Tool ist kostenlos und wird laufend verbessert. Wenn du Feedback hast, etwas nicht funktioniert, du ein Feature vermisst — oder wenn du das Tool auf deiner Webseite einbetten möchtest — schreib einfach eine Mail.</p>
-      <a href="mailto:rambog342@gmail.com?subject=Passerelle Lerntool – Feedback" class="resource-link-card" style="margin-bottom:0;">
-        <div class="resource-link-icon">✉️</div>
-        <div class="resource-link-body">
-          <div class="resource-link-title">rambog342@gmail.com</div>
-          <div class="resource-link-desc">Direkter Kontakt zur Person, die dieses Tool entwickelt hat. Schreib auf Deutsch oder Englisch, wie es dir am besten passt.</div>
-          <div class="resource-link-tags">
-            <span class="resource-tag">Feedback</span>
-            <span class="resource-tag">Feature-Ideen</span>
-            <span class="resource-tag">Einbetten / Teilen</span>
-            <span class="resource-tag">Bug melden</span>
-          </div>
-        </div>
-        <div class="resource-link-arrow">→</div>
+      <p class="gl-p">Dieses Tool ist kostenlos und wird laufend verbessert. Feedback, Feature-Ideen oder Fehler — schreib einfach eine Mail.</p>
+      <a href="mailto:rambog342@gmail.com?subject=Passerelle Lerntool – Feedback" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:0.5em;text-decoration:none;">
+        ✉️ Feedback einreichen
       </a>
     </div>
 
@@ -2224,7 +2225,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       Das Tool ersetzt weder einen Therapeuten noch eine professionelle Lernberatung — es ist ein Selbsthilfe-Werkzeug für den Alltag.
     </div>
 
-    </div><!-- /.tips-overlay-inner -->
+    </div><!-- /#tipsPanelRessourcen -->
   </div><!-- /#tipsOverlay -->
 
 <!-- Notfall-FAB -->
@@ -3986,11 +3987,22 @@ function renderSessionLog() {
 function showTips() {
   const ov = document.getElementById('tipsOverlay');
   if (ov) { ov.classList.remove('hidden'); ov.scrollTop = 0; }
+  switchTipsTab('grundlagen');
 }
 
 function closeTips() {
   const ov = document.getElementById('tipsOverlay');
   if (ov) ov.classList.add('hidden');
+}
+
+function switchTipsTab(tab) {
+  ['grundlagen','ressourcen'].forEach(t => {
+    document.getElementById('tipsPanelGrundlagen'.replace('Grundlagen', t.charAt(0).toUpperCase()+t.slice(1)))
+      ?.classList.toggle('hidden', t !== tab);
+    document.getElementById('tipsBtn' + t.charAt(0).toUpperCase()+t.slice(1))
+      ?.classList.toggle('active', t === tab);
+  });
+  document.getElementById('tipsOverlay').scrollTop = 0;
 }
 
 // ============================================================
