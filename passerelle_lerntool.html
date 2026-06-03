@@ -1332,6 +1332,15 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       line-height: 1.5; pointer-events: none; white-space: nowrap;
       font-family: var(--font-sans);
     }
+    .sr-badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em;
+      background: var(--green-light); color: var(--green);
+      border: 1px solid var(--green-mid); border-radius: 20px;
+      padding: 2px 7px; vertical-align: middle; margin-left: 0.4em;
+      line-height: 1.5; pointer-events: none; white-space: nowrap;
+      font-family: var(--font-sans);
+    }
     .ref-card {
       background: var(--blue-light); border-left: 3px solid var(--blue);
       border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; margin: 0.6rem 0 1rem;
@@ -1550,6 +1559,37 @@ Inhalte anpassen (ohne Programmierkenntnisse):
         <div class="pomodoro-counter" id="pomCounter">Heutige Sessions: 0</div>
         <div class="pomodoro-dots" id="pomDots"></div>
       </div>
+    </div>
+
+    <!-- ═══ Spaced Repetition: heute fällige Lernkarten ═══ -->
+    <div class="card hidden" id="srDueCard" style="margin-bottom:1rem;">
+      <div class="feature-header" style="margin-bottom:0.75rem;">
+        <div class="card-title" style="margin-bottom:0;">🗂 Lernkarten wiederholen<span class="sr-badge">SR</span></div>
+      </div>
+      <div id="srDueBody"></div>
+    </div>
+
+    <!-- SR-Wiederholungs-Modus -->
+    <div class="card hidden" id="srReviewArea" style="margin-bottom:1rem;">
+      <div class="flex-between" style="margin-bottom:0.75rem;">
+        <span class="text-sm text-light" id="srProgress">Karte 1 von 1</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelSrReview()" aria-label="Wiederholung beenden">Beenden</button>
+      </div>
+      <div class="flashcard" id="srFlashcard" onclick="flipSrCard()" role="button" tabindex="0"
+           aria-label="Lernkarte – tippen zum Umdrehen"
+           onkeydown="if(event.key==='Enter'){flipSrCard();}">
+        <div class="flashcard-inner" id="srFlashcardInner">
+          <div class="flashcard-face flashcard-front"><span id="srFront"></span></div>
+          <div class="flashcard-face flashcard-back"><span id="srBack"></span></div>
+        </div>
+      </div>
+      <div class="flashcard-hint text-sm text-light" id="srHint">Tippen zum Umdrehen, dann bewerten</div>
+      <div class="flashcard-nav" id="srGradeNav" style="display:none;">
+        <button class="btn btn-danger" onclick="gradeSrCard(1)">Nochmal</button>
+        <button class="btn btn-success" onclick="gradeSrCard(4)">Gut</button>
+        <button class="btn btn-outline" onclick="gradeSrCard(5)">Einfach</button>
+      </div>
+      <div id="srDone" class="hidden" style="margin-top:1rem;text-align:center;"></div>
     </div>
 
     <!-- ═══ ACCORDION: Zusammenklappbare Sektionen ═══ -->
@@ -1877,7 +1917,10 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <div class="card hidden" id="flashcardArea">
       <div class="flex-between" style="margin-bottom:0.75rem;">
         <span class="text-sm text-light" id="flashProgress">Karte 1 von 1</span>
-        <button class="btn btn-outline btn-sm" onclick="shuffleFlashcards()" aria-label="Karten mischen">🔀 Mischen</button>
+        <div class="flex-gap">
+          <button class="btn btn-outline btn-sm" onclick="addDeckFromUeben(this)" aria-label="Zu meinen Lernkarten hinzufügen">➕ Zu Lernkarten</button>
+          <button class="btn btn-outline btn-sm" onclick="shuffleFlashcards()" aria-label="Karten mischen">🔀 Mischen</button>
+        </div>
       </div>
       <div class="flashcard" id="flashcard" onclick="flipFlashcard()" role="button" tabindex="0"
            aria-label="Karteikarte – tippen zum Umdrehen"
@@ -2554,6 +2597,10 @@ let state = {
   noten: { Deutsch: null, Englisch: null, Mathematik: null, Biologie: null, Chemie: null, Physik: null, Geografie: null, Geschichte: null },
   // Egal-wenn-Liste: eigene entlastende Sätze
   egalWenn: [],
+  // Spaced-Repetition-Deck (persistierte Lernkarten, SM-2)
+  srCards: [],
+  // Schema-Version für additive Migrationen (nie Nutzerdaten zerstören)
+  schemaVersion: 2,
 };
 
 // Pomodoro-Laufzustand (nicht persistiert)
@@ -2628,14 +2675,33 @@ function loadFromStorage() {
     if (typeof parsed.motIndex === 'number') state.motIndex = parsed.motIndex;
     if (parsed.noten && typeof parsed.noten === 'object' && parsed.noten !== null) state.noten = { ...state.noten, ...parsed.noten };
     if (Array.isArray(parsed.egalWenn)) state.egalWenn = parsed.egalWenn;
+    if (Array.isArray(parsed.srCards)) state.srCards = parsed.srCards;
+    if (typeof parsed.schemaVersion === 'number') state.schemaVersion = parsed.schemaVersion;
     // Fehlende Fächer aus Default ergänzen
     Object.keys(defaultTriage).forEach(s => {
       if (!state.triage[s]) state.triage[s] = JSON.parse(JSON.stringify(defaultTriage[s]));
     });
     // Migration: flache Themen (ohne lernziele) auf 3-Ebenen-Modell heben
     migrateTriage();
+    // Migration: SR-Deck-Felder sicherstellen (additiv, zerstört nichts)
+    migrateSchema();
     if (!state.weekPlan) state.weekPlan = JSON.parse(JSON.stringify(weekTemplate));
   } catch (e) { console.warn('Laden fehlgeschlagen:', e); }
+}
+
+// Additive Schema-Migration: ergänzt fehlende SR-Felder, ohne Bestehendes zu löschen.
+function migrateSchema() {
+  if (!Array.isArray(state.srCards)) state.srCards = [];
+  const today = todayISO();
+  state.srCards.forEach(c => {
+    if (!c.id) c.id = uid();
+    if (typeof c.ease !== 'number') c.ease = 2.5;
+    if (typeof c.interval !== 'number') c.interval = 0;
+    if (typeof c.reps !== 'number') c.reps = 0;
+    if (!c.due) c.due = today;
+    if (!c.created) c.created = today;
+  });
+  state.schemaVersion = 2;
 }
 
 // Migration: jedes Thema bekommt ein lernziele-Array; jedes Lernziel ein sub-Array.
@@ -2666,6 +2732,7 @@ function switchTab(tab) {
     btn.classList.toggle('active', active);
     btn.setAttribute('aria-selected', active);
   });
+  if (tab === 'heute') { renderSrDue(); }
   if (tab === 'plan') { renderWeekPlan(); }
   if (tab === 'rueckblick') { renderReviews(); renderSessionLog(); renderCluster(); }
   if (tab === 'stoff') { renderSubjectTabs(); renderTopics(); }
@@ -2771,6 +2838,8 @@ function collectUebenLernziele() {
 
 async function generateUeben() {
   const { subject, topic, lernziele } = collectUebenLernziele();
+  ueben.subject = subject;
+  ueben.topic = topic;
   const errorEl = document.getElementById('uebenError');
   const emptyEl = document.getElementById('uebenEmpty');
   const loading = document.getElementById('uebenLoading');
@@ -2883,6 +2952,8 @@ function showFlashDone() {
   if (hardN > 0) html += `<button class="btn btn-primary" onclick="repeatHardFlashcards()">${hardN} schwierige wiederholen</button>`;
   html += `<button class="btn btn-outline" onclick="restartFlashcards()">Von vorne</button>`;
   html += `</div>`;
+  html += `<div style="margin-top:0.75rem;"><button class="btn btn-success" onclick="addDeckFromUeben(this)">➕ Zu meinen Lernkarten hinzufügen</button></div>`;
+  html += `<div class="text-sm text-light" style="margin-top:0.5rem;">Gespeicherte Karten erscheinen im Heute-Tab, sobald sie fällig sind.</div>`;
   done.innerHTML = html;
   done.classList.remove('hidden');
 }
@@ -2897,6 +2968,147 @@ function repeatHardFlashcards() {
   const hard = ueben.cards.filter((_, i) => !ueben.known.has(i));
   if (!hard.length) { restartFlashcards(); return; }
   startFlashcards(hard);
+}
+
+// ============================================================
+// SPACED REPETITION (SM-2) — persistierte Lernkarten
+// ============================================================
+const sr = { queue: [], idx: 0 };
+
+function addDaysISO(iso, n) {
+  const d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toISOString().split('T')[0];
+}
+
+// SM-2: q=1 «Nochmal» (nicht gewusst), q=4 «Gut», q=5 «Einfach».
+// Aktualisiert ease, interval, reps und das nächste Fälligkeitsdatum.
+function sm2(card, q) {
+  if (q < 3) {
+    card.reps = 0;
+    card.interval = 1;            // morgen erneut
+  } else {
+    if (card.reps === 0)      card.interval = 1;
+    else if (card.reps === 1) card.interval = 6;
+    else                      card.interval = Math.round(card.interval * card.ease);
+    card.reps += 1;
+  }
+  const ef = card.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  card.ease = Math.max(1.3, Math.round(ef * 100) / 100);
+  card.due = addDaysISO(todayISO(), card.interval);
+}
+
+function dueCards() {
+  const today = todayISO();
+  return (state.srCards || []).filter(c => c.due <= today);
+}
+
+// Karten aus dem aktuellen Üben-Deck ins persistierte SR-Deck übernehmen.
+// Duplikate (gleiches Fach + gleiche Vorderseite) werden übersprungen.
+function addCurrentDeckToSR() {
+  const subject = ueben.subject || '';
+  const topic = ueben.topic || '';
+  const today = todayISO();
+  let added = 0;
+  (ueben.cards || []).forEach(c => {
+    if (!c || !c.front || !c.back) return;
+    const dup = state.srCards.some(x => x.subject === subject && x.front === c.front);
+    if (dup) return;
+    state.srCards.push({
+      id: uid(), front: c.front, back: c.back, subject, topic,
+      ease: 2.5, interval: 0, reps: 0, due: today, created: today,
+    });
+    added++;
+  });
+  save();
+  renderSrDue();
+  return added;
+}
+
+// Button im Üben-Tab: aktuelles Deck zu den Lernkarten hinzufügen.
+function addDeckFromUeben(btn) {
+  const n = addCurrentDeckToSR();
+  if (btn) {
+    btn.textContent = n > 0 ? `✓ ${n} hinzugefügt` : 'Schon gespeichert';
+    btn.disabled = true;
+  }
+}
+
+function renderSrDue() {
+  const card = document.getElementById('srDueCard');
+  const body = document.getElementById('srDueBody');
+  if (!card || !body) return;
+  const total = (state.srCards || []).length;
+  if (total === 0) { card.classList.add('hidden'); return; }
+  // Während einer laufenden Wiederholung die Übersicht ausgeblendet lassen
+  const reviewing = !document.getElementById('srReviewArea').classList.contains('hidden');
+  if (reviewing) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  const due = dueCards();
+  if (due.length === 0) {
+    body.innerHTML = `<p class="text-sm text-light" style="margin:0;">Heute keine Karten fällig — alles wiederholt. ✓<br>Dein Deck: ${total} Karte${total !== 1 ? 'n' : ''}.</p>`;
+  } else {
+    body.innerHTML =
+      `<p class="text-sm" style="margin:0 0 0.75rem;"><strong>${due.length}</strong> Karte${due.length !== 1 ? 'n' : ''} heute fällig <span class="text-light">· Deck: ${total}</span></p>` +
+      `<button class="btn btn-success full-width" onclick="startSrReview()">Wiederholen starten</button>`;
+  }
+}
+
+function startSrReview() {
+  sr.queue = dueCards();
+  sr.idx = 0;
+  if (!sr.queue.length) { renderSrDue(); return; }
+  document.getElementById('srReviewArea').classList.remove('hidden');
+  document.getElementById('srDone').classList.add('hidden');
+  document.getElementById('srDueCard').classList.add('hidden');
+  showSrCard();
+}
+
+function showSrCard() {
+  if (sr.idx >= sr.queue.length) { finishSrReview(); return; }
+  const c = sr.queue[sr.idx];
+  const fc = document.getElementById('srFlashcard');
+  fc.classList.remove('flipped', 'hidden');
+  document.getElementById('srFront').textContent = c.front;
+  document.getElementById('srBack').textContent = c.back;
+  document.getElementById('srProgress').textContent = `Karte ${sr.idx + 1} von ${sr.queue.length}`;
+  document.getElementById('srHint').style.display = '';
+  document.getElementById('srGradeNav').style.display = 'none';
+  document.getElementById('srDone').classList.add('hidden');
+}
+
+function flipSrCard() {
+  const fc = document.getElementById('srFlashcard');
+  if (fc.classList.contains('hidden')) return;
+  const flipped = fc.classList.toggle('flipped');
+  document.getElementById('srGradeNav').style.display = flipped ? 'flex' : 'none';
+  document.getElementById('srHint').style.display = flipped ? 'none' : '';
+}
+
+function gradeSrCard(q) {
+  if (sr.idx >= sr.queue.length) return;
+  sm2(sr.queue[sr.idx], q);
+  save();
+  sr.idx++;
+  showSrCard();
+}
+
+function cancelSrReview() {
+  document.getElementById('srReviewArea').classList.add('hidden');
+  renderSrDue();
+}
+
+function finishSrReview() {
+  document.getElementById('srFlashcard').classList.add('hidden');
+  document.getElementById('srGradeNav').style.display = 'none';
+  document.getElementById('srHint').style.display = 'none';
+  document.getElementById('srProgress').textContent = 'Fertig';
+  const done = document.getElementById('srDone');
+  done.innerHTML =
+    `<div style="font-size:1.05rem;font-weight:600;margin-bottom:0.3rem;">Alles wiederholt für heute 🎉</div>` +
+    `<div class="text-sm text-light" style="margin-bottom:1rem;">Die Karten kommen automatisch wieder, sobald sie fällig sind.</div>` +
+    `<button class="btn btn-outline" onclick="cancelSrReview()">Schliessen</button>`;
+  done.classList.remove('hidden');
 }
 
 // ---------- Selbsttest / Quiz ----------
@@ -4340,6 +4552,7 @@ function renderAll() {
   renderDidYouKnow();
   renderCountdown();
   renderTasks();
+  renderSrDue();
   renderStats();
   renderProgressBars();
   renderJournal();
@@ -4360,6 +4573,7 @@ function renderAll() {
 // ============================================================
 loadFromStorage();
 migrateTriage(); // auch für Erstbesucher (Default-Themen) das lernziele-Feld sicherstellen
+migrateSchema(); // SR-Deck-Felder auch für Erstbesucher sicherstellen
 renderAll();
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
