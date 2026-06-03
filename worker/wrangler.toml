@@ -1,0 +1,17 @@
+name = "passerelle-ai-proxy"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+# Erlaubter Origin für den CORS-/Origin-Check.
+# Anpassen, falls eine eigene Domain genutzt wird (z.B. eine GitHub-Pages-Custom-Domain).
+[vars]
+ALLOWED_ORIGIN = "https://usr1243.github.io"
+
+# GROQ_API_KEY wird NICHT hier abgelegt, sondern als Secret gesetzt:
+#   npx wrangler secret put GROQ_API_KEY
+# (siehe README.md)
+
+# Optionaler, persistenter Rate-Limit über KV (siehe README.md → Härtung):
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT"
+# id = "<deine-kv-namespace-id>"

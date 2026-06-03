@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "passerelle/quiz-response",
+  "title": "KI-Proxy Antwort – mode=quiz",
+  "description": "Antwort auf einen quiz-Request. Vom Frontend in startQuiz()/renderQuizQuestion() verarbeitet (filtert auf q && answer). type 'mc' nutzt options, 'open' nicht.",
+  "type": "object",
+  "required": ["questions"],
+  "properties": {
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "q", "answer"],
+        "properties": {
+          "type": { "type": "string", "enum": ["mc", "open"] },
+          "q": { "type": "string", "description": "Fragetext" },
+          "options": {
+            "type": "array",
+            "description": "Nur bei type=mc: genau 4 Antwortoptionen.",
+            "items": { "type": "string" },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "answer": { "type": "string", "description": "Bei mc: exakter Text der richtigen Option. Bei open: Musterlösung." },
+          "explanation": { "type": "string", "description": "Kurze Begründung (1–2 Sätze)" },
+          "lernzielRef": { "type": "string", "description": "Text des Lernziels, an dem die Frage verankert ist" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "mc" } } },
+            "then": { "required": ["options"] }
+          }
+        ]
+      }
+    }
+  }
+}

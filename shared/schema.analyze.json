@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "passerelle/analyze-response",
+  "title": "KI-Proxy Antwort – mode=analyze",
+  "description": "Antwort auf einen analyze-Request. Vom Frontend in mergeAiResults() verarbeitet. Gültige Fächer = die 8 Passerelle-Fächer.",
+  "type": "object",
+  "required": ["subjects"],
+  "properties": {
+    "subjects": {
+      "type": "object",
+      "description": "Schlüssel = Fachname (eines der 8 erlaubten Fächer).",
+      "propertyNames": {
+        "enum": ["Deutsch", "Englisch", "Mathematik", "Biologie", "Chemie", "Physik", "Geografie", "Geschichte"]
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "lernziele"],
+          "properties": {
+            "name": { "type": "string", "maxLength": 60, "description": "Thema/Kapitel" },
+            "level": { "type": "string", "enum": ["A", "B", "C", "X"], "description": "Wichtigkeitsstufe" },
+            "lernziele": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                  "text": { "type": "string", "maxLength": 100 },
+                  "sub": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["text"],
+                      "properties": { "text": { "type": "string", "maxLength": 100 } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

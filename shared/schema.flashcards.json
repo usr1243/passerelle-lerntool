@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "passerelle/flashcards-response",
+  "title": "KI-Proxy Antwort – mode=flashcards",
+  "description": "Antwort auf einen flashcards-Request. Vom Frontend in startFlashcards() verarbeitet (filtert auf front && back).",
+  "type": "object",
+  "required": ["cards"],
+  "properties": {
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["front", "back"],
+        "properties": {
+          "front": { "type": "string", "description": "Frage/Aufgabe (Vorderseite)" },
+          "back": { "type": "string", "description": "Antwort (Rückseite), 1–4 Sätze" }
+        }
+      }
+    }
+  }
+}
