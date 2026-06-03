@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FAF7F2"/>
+  <rect x="0" y="0" width="1200" height="12" fill="#4A7C59"/>
+  <g transform="translate(100,150)">
+    <rect width="120" height="120" rx="28" fill="#4A7C59"/>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="78" font-weight="bold" text-anchor="middle" fill="#FAF7F2">P</text>
+  </g>
+  <text x="100" y="360" font-family="Georgia, serif" font-size="64" font-weight="bold" fill="#2C2C2C">Passerelle bestehen</text>
+  <text x="100" y="430" font-family="Georgia, serif" font-size="40" fill="#4A7C59">Kostenloses Lerntool &amp; Lernplaner</text>
+  <text x="100" y="500" font-family="system-ui, sans-serif" font-size="28" fill="#6B6561">Karteikarten · Lernquiz · Wochenplan · Pomodoro · offline</text>
+  <text x="100" y="556" font-family="system-ui, sans-serif" font-size="24" fill="#C97064">usr1243.github.io/passerelle-lerntool</text>
+</svg>

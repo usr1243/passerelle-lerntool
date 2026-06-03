@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://usr1243.github.io/passerelle-lerntool/sitemap.xml
