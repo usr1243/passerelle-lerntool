@@ -2336,12 +2336,11 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       <button class="btn btn-primary" onclick="sendLoginOtp()" style="width:100%;">Code senden</button>
     </div>
 
-    <!-- Schritt 2: OTP -->
+    <!-- Schritt 2: Link-Hinweis -->
     <div id="loginStep2" class="login-step hidden">
-      <div class="overlay-title" style="margin-bottom:0.25rem;">Code eingeben</div>
-      <p class="login-hint">Code gesendet an <strong id="loginEmailDisplay"></strong></p>
-      <input type="text" id="loginOtp" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" style="width:100%;">
-      <button class="btn btn-primary" onclick="verifyLoginOtp()" style="width:100%;">Anmelden</button>
+      <div class="overlay-title" style="margin-bottom:0.25rem;">Mail prüfen</div>
+      <p class="login-hint">Ein Link wurde an <strong id="loginEmailDisplay"></strong> gesendet.</p>
+      <p class="login-hint">Klick auf den Link in der Mail — du wirst automatisch eingeloggt und zur App weitergeleitet.</p>
       <button class="btn btn-outline" onclick="backToEmail()" style="width:100%;">Andere E-Mail</button>
     </div>
 
@@ -2775,9 +2774,25 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 let sbClient = null;
 let syncPushTimer = null;
 
+const APP_URL = 'https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html';
+
 function initSupabase() {
   if (typeof window.supabase === 'undefined') return; // SDK nicht geladen (offline)
-  sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+  sbClient = window.supabase.createClient(SB_URL, SB_KEY, {
+    auth: { flowType: 'implicit', detectSessionInUrl: true }
+  });
+  sbClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      updateAuthBtn(session.user);
+      // Hash aus URL entfernen (sieht sonst unschön aus)
+      if (window.location.hash.includes('access_token')) {
+        history.replaceState(null, '', window.location.pathname);
+      }
+      onLoginSuccess();
+    } else if (event === 'SIGNED_OUT') {
+      updateAuthBtn(null);
+    }
+  });
 }
 
 async function sbUser() {
@@ -2791,42 +2806,25 @@ async function sbUser() {
 async function sendLoginOtp() {
   const email = document.getElementById('loginEmail').value.trim();
   if (!email) return;
-  setLoginStatus('', 'Code wird gesendet…');
+  setLoginStatus('', 'Link wird gesendet…');
   try {
-    const { error } = await sbClient.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+    const { error } = await sbClient.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true, emailRedirectTo: APP_URL }
+    });
     if (error) throw error;
     document.getElementById('loginEmailDisplay').textContent = email;
     document.getElementById('loginStep1').classList.add('hidden');
     document.getElementById('loginStep2').classList.remove('hidden');
-    document.getElementById('loginOtp').focus();
     setLoginStatus('', '');
   } catch (e) {
     setLoginStatus('err', 'Fehler beim Senden: ' + (e.message || e));
   }
 }
 
-async function verifyLoginOtp() {
-  const email = document.getElementById('loginEmailDisplay').textContent;
-  const token = document.getElementById('loginOtp').value.trim();
-  if (token.length < 6) return;
-  setLoginStatus('', 'Wird überprüft…');
-  try {
-    const { error } = await sbClient.auth.verifyOtp({ email, token, type: 'email' });
-    if (error) throw error;
-    setLoginStatus('ok', 'Angemeldet!');
-    setTimeout(async () => {
-      closeLoginModal();
-      await onLoginSuccess();
-    }, 600);
-  } catch {
-    setLoginStatus('err', 'Ungültiger Code. Bitte erneut versuchen.');
-  }
-}
-
 function backToEmail() {
   document.getElementById('loginStep2').classList.add('hidden');
   document.getElementById('loginStep1').classList.remove('hidden');
-  document.getElementById('loginOtp').value = '';
   setLoginStatus('', '');
 }
 
