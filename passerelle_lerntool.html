@@ -1436,6 +1436,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       .week-grid { grid-template-columns: 1fr; }
       .greeting-title { font-size: 1.5rem; }
     }
+    /* Sync-Toggle */
+    .sync-toggle-wrap { display:flex; align-items:center; justify-content:space-between; }
+    .toggle-switch { position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:#ccc; border-radius:22px; cursor:pointer; transition:background .2s; }
+    .toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:transform .2s; }
+    .toggle-switch input:checked + .toggle-slider { background:var(--green); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(18px); }
+    .sync-code-display { font-family:monospace; font-size:1.05rem; font-weight:700; letter-spacing:.12em; background:var(--bg-subtle); padding:.3rem .6rem; border-radius:var(--radius-sm); flex:1; }
+    .sync-status-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#ccc; margin-right:.35rem; }
+    .sync-status-dot.ok { background:var(--green); }
+    .sync-status-dot.err { background:var(--terracotta); }
   </style>
 </head>
 <body>
@@ -1718,6 +1730,37 @@ Inhalte anpassen (ohne Programmierkenntnisse):
           </div>
           <div id="journalList"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ Geräte-Sync ═══ -->
+    <div class="card" style="margin-top:1rem;">
+      <div class="sync-toggle-wrap">
+        <span class="card-title" style="margin-bottom:0;">Geräte-Sync</span>
+        <label class="toggle-switch" aria-label="Sync ein- oder ausschalten">
+          <input type="checkbox" id="syncToggle" onchange="onSyncToggle(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div id="syncPanel" class="hidden" style="margin-top:0.9rem; display:flex; flex-direction:column; gap:0.6rem;">
+        <div>
+          <div style="font-size:0.82rem; color:var(--text-light); margin-bottom:0.3rem;">Dein Sync-Code — auf anderem Gerät eingeben</div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span class="sync-code-display" id="syncCodeDisplay"></span>
+            <button class="btn btn-outline btn-sm" onclick="copySyncCode()">Kopieren</button>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline btn-sm" id="showSyncInputBtn" onclick="showSyncCodeInput()" style="font-size:0.8rem;">Anderen Code eingeben</button>
+          <div id="syncCodeInputArea" class="hidden" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <input type="text" id="syncCodeInput" placeholder="z.B. X7K2-M4NP" maxlength="9" style="flex:1; text-transform:uppercase; font-family:monospace;">
+            <button class="btn btn-primary btn-sm" onclick="applySyncCode()">Übernehmen</button>
+          </div>
+        </div>
+        <div style="font-size:0.82rem; color:var(--text-light);">
+          <span class="sync-status-dot" id="syncStatusDot"></span><span id="syncStatusText">Noch nicht synchronisiert</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="manualSync()" style="align-self:flex-start;">Jetzt synchronisieren</button>
       </div>
     </div>
 
@@ -2657,6 +2700,7 @@ function showSaveError() {
 function saveNow() {
   try { localStorage.setItem('passerelle_v1', JSON.stringify(state)); }
   catch (e) { console.warn('Speichern fehlgeschlagen:', e); showSaveError(); }
+  scheduleSyncPush();
 }
 function save() {
   clearTimeout(saveTimer);
@@ -2711,6 +2755,208 @@ function migrateSchema() {
     if (!c.created) c.created = today;
   });
   state.schemaVersion = 2;
+}
+
+// ============================================================
+// GERÄTE-SYNC (Supabase, offline-first, sync-code-based)
+// ============================================================
+const SB_URL = 'https://uyeezuskvzdxvjbdkmdy.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZWV6dXNrdnpkeHZqYmRrbWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MzA5MzksImV4cCI6MjA5NjEwNjkzOX0.TBJb7onesjE8IUO8p7g4paMWmtT1qzFJR2FSbUihqoI';
+const SYNC_STORAGE_KEY = 'passerelle_sync';
+let syncPushTimer = null;
+
+function loadSyncConfig() {
+  try { return JSON.parse(localStorage.getItem(SYNC_STORAGE_KEY)) || null; }
+  catch { return null; }
+}
+function saveSyncConfig(cfg) {
+  localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(cfg));
+}
+
+function generateSyncCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 9; i++) {
+    if (i === 4) { code += '-'; continue; }
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code; // Format: XXXX-XXXX
+}
+
+async function syncPush(cfg) {
+  const payload = JSON.stringify(state);
+  const res = await fetch(`${SB_URL}/rest/v1/sync_data`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates'
+    },
+    body: JSON.stringify({ sync_code: cfg.code, payload: JSON.parse(payload) })
+  });
+  if (!res.ok) throw new Error(`Push fehlgeschlagen: ${res.status}`);
+  cfg.lastPush = new Date().toISOString();
+  saveSyncConfig(cfg);
+}
+
+async function syncPull(cfg) {
+  const res = await fetch(
+    `${SB_URL}/rest/v1/sync_data?sync_code=eq.${encodeURIComponent(cfg.code)}&select=payload,updated_at`,
+    { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }
+  );
+  if (!res.ok) throw new Error(`Pull fehlgeschlagen: ${res.status}`);
+  const rows = await res.json();
+  if (!rows.length) return false; // Noch nichts in der Cloud
+  const remote = rows[0];
+  const remoteAt = new Date(remote.updated_at).getTime();
+  const lastPull = cfg.lastPull ? new Date(cfg.lastPull).getTime() : 0;
+  if (remoteAt <= lastPull) return false; // Nichts Neues
+  // Remote-Daten einlesen (sicher: loadFromStorage-Logik wiederverwenden)
+  const parsed = remote.payload;
+  if (parsed.tasks    && Array.isArray(parsed.tasks))    state.tasks    = parsed.tasks;
+  if (parsed.sessions && Array.isArray(parsed.sessions)) state.sessions = parsed.sessions;
+  if (parsed.journal  && Array.isArray(parsed.journal))  state.journal  = parsed.journal;
+  if (parsed.reviews  && Array.isArray(parsed.reviews))  state.reviews  = parsed.reviews;
+  if (parsed.egalWenn && Array.isArray(parsed.egalWenn)) state.egalWenn = parsed.egalWenn;
+  if (parsed.srCards  && Array.isArray(parsed.srCards))  state.srCards  = parsed.srCards;
+  if (parsed.triage   && typeof parsed.triage  === 'object') state.triage   = parsed.triage;
+  if (parsed.weekPlan && typeof parsed.weekPlan === 'object') state.weekPlan = parsed.weekPlan;
+  if (parsed.noten    && typeof parsed.noten   === 'object') state.noten    = { ...state.noten, ...parsed.noten };
+  if (parsed.settings && typeof parsed.settings === 'object') state.settings = { ...state.settings, ...parsed.settings };
+  if (typeof parsed.motIndex === 'number') state.motIndex = parsed.motIndex;
+  saveNow();
+  cfg.lastPull = new Date().toISOString();
+  saveSyncConfig(cfg);
+  return true;
+}
+
+function scheduleSyncPush() {
+  const cfg = loadSyncConfig();
+  if (!cfg || !cfg.enabled) return;
+  clearTimeout(syncPushTimer);
+  syncPushTimer = setTimeout(async () => {
+    try {
+      await syncPush(cfg);
+      setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+    } catch {
+      setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+    }
+  }, 3000);
+}
+
+async function initSyncOnLoad() {
+  const cfg = loadSyncConfig();
+  if (!cfg || !cfg.enabled) return;
+  // UI sofort einrichten
+  renderSyncPanel(cfg);
+  try {
+    setSyncStatus('', 'Synchronisiere…');
+    const pulled = await syncPull(cfg);
+    if (pulled) {
+      renderAll();
+      setSyncStatus('ok', `Daten vom anderen Gerät geladen`);
+    } else {
+      await syncPush(cfg);
+      setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+    }
+  } catch {
+    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+  }
+}
+
+// ---- UI ----
+
+function renderSyncPanel(cfg) {
+  const toggle = document.getElementById('syncToggle');
+  const panel  = document.getElementById('syncPanel');
+  if (!toggle || !panel) return;
+  toggle.checked = cfg && cfg.enabled;
+  if (cfg && cfg.enabled) {
+    panel.classList.remove('hidden');
+    document.getElementById('syncCodeDisplay').textContent = cfg.code;
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+
+function setSyncStatus(type, msg) {
+  const dot  = document.getElementById('syncStatusDot');
+  const text = document.getElementById('syncStatusText');
+  if (!dot || !text) return;
+  dot.className  = 'sync-status-dot' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
+  text.textContent = msg;
+}
+
+function onSyncToggle(enabled) {
+  let cfg = loadSyncConfig() || {};
+  cfg.enabled = enabled;
+  if (!cfg.code) cfg.code = generateSyncCode();
+  saveSyncConfig(cfg);
+  renderSyncPanel(cfg);
+  if (enabled) {
+    syncPush(cfg)
+      .then(() => setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`))
+      .catch(() => setSyncStatus('err', 'Offline – Daten lokal gespeichert'));
+  }
+}
+
+function copySyncCode() {
+  const cfg = loadSyncConfig();
+  if (!cfg) return;
+  navigator.clipboard.writeText(cfg.code).then(() => {
+    const btn = document.querySelector('#syncPanel button');
+    const orig = btn.textContent;
+    btn.textContent = 'Kopiert!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function showSyncCodeInput() {
+  const area = document.getElementById('syncCodeInputArea');
+  const btn  = document.getElementById('showSyncInputBtn');
+  area.classList.toggle('hidden');
+  if (!area.classList.contains('hidden')) {
+    btn.textContent = 'Abbrechen';
+    document.getElementById('syncCodeInput').focus();
+  } else {
+    btn.textContent = 'Anderen Code eingeben';
+  }
+}
+
+async function applySyncCode() {
+  const input = document.getElementById('syncCodeInput').value.trim().toUpperCase();
+  if (input.length < 8) { alert('Bitte einen gültigen Code eingeben (z.B. X7K2-M4NP)'); return; }
+  let cfg = loadSyncConfig() || { enabled: true };
+  cfg.code = input;
+  cfg.enabled = true;
+  cfg.lastPull = null;
+  saveSyncConfig(cfg);
+  renderSyncPanel(cfg);
+  document.getElementById('syncCodeInputArea').classList.add('hidden');
+  document.getElementById('showSyncInputBtn').textContent = 'Anderen Code eingeben';
+  setSyncStatus('', 'Synchronisiere…');
+  try {
+    const pulled = await syncPull(cfg);
+    if (pulled) { renderAll(); setSyncStatus('ok', 'Daten geladen'); }
+    else { await syncPush(cfg); setSyncStatus('ok', 'Verbunden'); }
+  } catch {
+    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+  }
+}
+
+async function manualSync() {
+  const cfg = loadSyncConfig();
+  if (!cfg || !cfg.enabled) return;
+  setSyncStatus('', 'Synchronisiere…');
+  try {
+    const pulled = await syncPull(cfg);
+    if (pulled) renderAll();
+    await syncPush(cfg);
+    setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+  } catch {
+    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+  }
 }
 
 // Migration: jedes Thema bekommt ein lernziele-Array; jedes Lernziel ein sub-Array.
@@ -4584,6 +4830,8 @@ loadFromStorage();
 migrateTriage(); // auch für Erstbesucher (Default-Themen) das lernziele-Feld sicherstellen
 migrateSchema(); // SR-Deck-Felder auch für Erstbesucher sicherstellen
 renderAll();
+initSyncOnLoad(); // Sync: Pull beim Start, async, blockiert App nicht
+renderSyncPanel(loadSyncConfig()); // Sync-UI initialisieren
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
