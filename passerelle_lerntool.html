@@ -1439,6 +1439,14 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     }
     /* Auth-Login-Modal */
     .auth-btn-avatar { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; min-width:32px; min-height:32px; border-radius:50%; background:var(--terracotta); color:#fff; font-size:0.8rem; font-weight:700; border:none; cursor:pointer; padding:0; line-height:1; }
+    #authBtn:not(.auth-btn-avatar) { background:var(--terracotta); color:#fff; border-color:var(--terracotta); }
+    @keyframes syncPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,112,100,0.5)} 50%{box-shadow:0 0 0 7px rgba(201,112,100,0)} }
+    .auth-btn-pulse { animation: syncPulse 2s ease-in-out infinite; }
+    /* Sync-Banner */
+    .sync-banner { background:var(--terracotta-light); border:1px solid #f0c0bb; border-radius:var(--radius); padding:1rem 1.1rem; margin:0 0 1rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .sync-banner-text { flex:1; font-size:0.88rem; line-height:1.5; color:var(--text); }
+    .sync-banner-title { font-weight:700; margin-bottom:0.2rem; color:var(--terracotta); }
+    .sync-banner-actions { display:flex; gap:0.5rem; margin-top:0.6rem; flex-wrap:wrap; }
     .login-step { display:flex; flex-direction:column; gap:0.6rem; }
     .otp-input { font-size:1.6rem; text-align:center; letter-spacing:0.35em; font-family:monospace; padding:0.5rem; }
     .login-hint { font-size:0.82rem; color:var(--text-light); }
@@ -1481,6 +1489,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
        PANEL 1: HEUTE
        ============================================================ -->
   <div id="panel-heute" class="panel active" role="tabpanel" aria-labelledby="tab-heute">
+
+    <!-- Einmal-Hinweis: Sync jetzt verfügbar -->
+    <div id="syncBanner" class="sync-banner hidden">
+      <div class="sync-banner-text">
+        <div class="sync-banner-title">Neu: Daten auf allen Geräten synchronisieren</div>
+        Melde dich an — deine bestehenden Daten werden sofort gesichert und stehen auf jedem Gerät zur Verfügung.
+        <div class="sync-banner-actions">
+          <button class="btn btn-sm" style="background:var(--terracotta);color:#fff;border:none;" onclick="dismissSyncBanner(true)">Jetzt anmelden</button>
+          <button class="btn btn-outline btn-sm" onclick="dismissSyncBanner(false)">Später</button>
+        </div>
+      </div>
+    </div>
 
     <div class="greeting">
       <div class="greeting-date" id="greetingDate"></div>
@@ -2938,14 +2958,37 @@ function updateAuthBtn(user) {
     const initials = (user.email || '?')[0].toUpperCase();
     btn.textContent = initials;
     btn.classList.add('auth-btn-avatar');
-    btn.classList.remove('btn-outline');
+    btn.classList.remove('btn-outline', 'auth-btn-pulse');
     btn.title = user.email;
+    hideSyncBanner();
   } else {
     btn.textContent = 'Anmelden';
     btn.classList.remove('auth-btn-avatar');
-    btn.classList.add('btn-outline');
+    btn.classList.add('btn-outline', 'auth-btn-pulse');
     btn.title = '';
   }
+}
+
+// ---- Sync-Banner (einmalig für Bestandsnutzer) ----
+const BANNER_KEY = 'passerelle_sync_banner_seen';
+
+function maybeShowSyncBanner() {
+  if (localStorage.getItem(BANNER_KEY)) return;
+  const hasData = state.tasks.length > 0 || state.srCards.length > 0 ||
+                  state.sessions.length > 0 || state.journal.length > 0;
+  if (!hasData) return;
+  document.getElementById('syncBanner').classList.remove('hidden');
+}
+
+function hideSyncBanner() {
+  const el = document.getElementById('syncBanner');
+  if (el) el.classList.add('hidden');
+  localStorage.setItem(BANNER_KEY, '1');
+}
+
+function dismissSyncBanner(openLogin) {
+  hideSyncBanner();
+  if (openLogin) onAuthBtnClick();
 }
 
 function setSyncStatusLine(type, msg) {
@@ -4865,6 +4908,7 @@ migrateTriage(); // auch für Erstbesucher (Default-Themen) das lernziele-Feld s
 migrateSchema(); // SR-Deck-Felder auch für Erstbesucher sicherstellen
 renderAll();
 initSyncOnLoad(); // Auth-Sync: Session prüfen + Pull beim Start, blockiert App nicht
+maybeShowSyncBanner(); // Einmal-Hinweis für Bestandsnutzer ohne Login
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
