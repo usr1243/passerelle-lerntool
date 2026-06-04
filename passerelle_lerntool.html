@@ -1447,6 +1447,12 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     .sync-banner-text { flex:1; font-size:0.88rem; line-height:1.5; color:var(--text); }
     .sync-banner-title { font-weight:700; margin-bottom:0.2rem; color:var(--terracotta); }
     .sync-banner-actions { display:flex; gap:0.5rem; margin-top:0.6rem; flex-wrap:wrap; }
+    /* Login-Eingabefeld */
+    .login-email-input { width:100%; padding:0.75rem 1rem; font-size:1rem; border:1.5px solid #e0d8d0; border-radius:var(--radius); background:var(--bg-subtle); color:var(--text); outline:none; transition:border-color .2s, box-shadow .2s; box-sizing:border-box; }
+    .login-email-input:focus { border-color:var(--terracotta); box-shadow:0 0 0 3px rgba(201,112,100,0.15); }
+    .login-email-input::placeholder { color:#b0a8a0; }
+    .btn-terracotta { background:var(--terracotta); color:#fff; border:none; box-shadow:0 2px 8px rgba(201,112,100,0.3); }
+    .btn-terracotta:hover { background:#b85f53; box-shadow:0 4px 12px rgba(201,112,100,0.4); }
     .login-step { display:flex; flex-direction:column; gap:0.6rem; }
     .otp-input { font-size:1.6rem; text-align:center; letter-spacing:0.35em; font-family:monospace; padding:0.5rem; }
     .login-hint { font-size:0.82rem; color:var(--text-light); }
@@ -2351,10 +2357,10 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 
     <!-- Schritt 1: E-Mail -->
     <div id="loginStep1" class="login-step">
-      <div class="overlay-title" style="margin-bottom:0.25rem;">Anmelden</div>
-      <p class="login-hint">Kein Passwort nötig — du bekommst einen 6-stelligen Code per E-Mail.</p>
-      <input type="email" id="loginEmail" placeholder="deine@email.ch" autocomplete="email" style="width:100%;">
-      <button class="btn btn-primary" onclick="sendLoginOtp()" style="width:100%;">Code senden</button>
+      <div class="overlay-title" style="margin-bottom:0.5rem;">Anmelden</div>
+      <p class="login-hint" style="margin-bottom:1rem;">Kein Passwort nötig — du bekommst einen Anmeldelink per E-Mail.</p>
+      <input type="email" id="loginEmail" class="login-email-input" placeholder="deine@email.ch" autocomplete="email">
+      <button class="btn btn-terracotta" onclick="sendLoginOtp()" style="width:100%;">Link senden</button>
     </div>
 
     <!-- Schritt 2: Link-Hinweis -->
