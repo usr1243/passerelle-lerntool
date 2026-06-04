@@ -19,6 +19,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <title>Passerelle Lerntool – üben, planen, bestehen</title>
   <meta name="description" content="Das kostenlose Lerntool für die Passerelle-Prüfung: Lernziele erfassen, mit Karteikarten und Lernquiz üben, Wochenplan und Pomodoro-Timer. Offline, ohne Konto.">
   <meta name="robots" content="index, follow">
@@ -1436,18 +1437,18 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       .week-grid { grid-template-columns: 1fr; }
       .greeting-title { font-size: 1.5rem; }
     }
-    /* Sync-Toggle */
-    .sync-toggle-wrap { display:flex; align-items:center; justify-content:space-between; }
-    .toggle-switch { position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; }
-    .toggle-switch input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; inset:0; background:#ccc; border-radius:22px; cursor:pointer; transition:background .2s; }
-    .toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:transform .2s; }
-    .toggle-switch input:checked + .toggle-slider { background:var(--green); }
-    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(18px); }
-    .sync-code-display { font-family:monospace; font-size:1.05rem; font-weight:700; letter-spacing:.12em; background:var(--bg-subtle); padding:.3rem .6rem; border-radius:var(--radius-sm); flex:1; }
-    .sync-status-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#ccc; margin-right:.35rem; }
-    .sync-status-dot.ok { background:var(--green); }
-    .sync-status-dot.err { background:var(--terracotta); }
+    /* Auth-Login-Modal */
+    .auth-btn-avatar { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:var(--green); color:#fff; font-size:0.75rem; font-weight:700; border:none; cursor:pointer; }
+    .login-step { display:flex; flex-direction:column; gap:0.6rem; }
+    .otp-input { font-size:1.6rem; text-align:center; letter-spacing:0.35em; font-family:monospace; padding:0.5rem; }
+    .login-hint { font-size:0.82rem; color:var(--text-light); }
+    .login-status { font-size:0.84rem; padding:0.4rem 0.6rem; border-radius:var(--radius-sm); margin-top:0.25rem; }
+    .login-status.err { background:#fdecea; color:var(--terracotta); }
+    .login-status.ok  { background:#e8f5e9; color:#2e7d32; }
+    .sync-status-line { font-size:0.8rem; color:var(--text-light); margin-top:0.3rem; }
+    .sync-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#ccc; margin-right:.3rem; vertical-align:middle; }
+    .sync-dot.ok { background:var(--green); }
+    .sync-dot.err { background:var(--terracotta); }
   </style>
 </head>
 <body>
@@ -1460,6 +1461,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
     <span class="app-title">Passerelle Lerntool</span>
     <div class="header-actions">
       <button class="btn btn-icon btn-sm" onclick="showTips()" aria-label="Tipps und Tricks öffnen">💡 Tipps und Tricks</button>
+      <button class="btn btn-outline btn-sm" id="authBtn" onclick="onAuthBtnClick()" aria-label="Anmelden">Anmelden</button>
     </div>
   </div>
   <nav class="nav-tabs" role="tablist" aria-label="Hauptnavigation">
@@ -1730,37 +1732,6 @@ Inhalte anpassen (ohne Programmierkenntnisse):
           </div>
           <div id="journalList"></div>
         </div>
-      </div>
-    </div>
-
-    <!-- ═══ Geräte-Sync ═══ -->
-    <div class="card" style="margin-top:1rem;">
-      <div class="sync-toggle-wrap">
-        <span class="card-title" style="margin-bottom:0;">Geräte-Sync</span>
-        <label class="toggle-switch" aria-label="Sync ein- oder ausschalten">
-          <input type="checkbox" id="syncToggle" onchange="onSyncToggle(this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div id="syncPanel" class="hidden" style="margin-top:0.9rem; display:flex; flex-direction:column; gap:0.6rem;">
-        <div>
-          <div style="font-size:0.82rem; color:var(--text-light); margin-bottom:0.3rem;">Dein Sync-Code — auf anderem Gerät eingeben</div>
-          <div style="display:flex; gap:0.5rem; align-items:center;">
-            <span class="sync-code-display" id="syncCodeDisplay"></span>
-            <button class="btn btn-outline btn-sm" onclick="copySyncCode()">Kopieren</button>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-outline btn-sm" id="showSyncInputBtn" onclick="showSyncCodeInput()" style="font-size:0.8rem;">Anderen Code eingeben</button>
-          <div id="syncCodeInputArea" class="hidden" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-            <input type="text" id="syncCodeInput" placeholder="z.B. X7K2-M4NP" maxlength="9" style="flex:1; text-transform:uppercase; font-family:monospace;">
-            <button class="btn btn-primary btn-sm" onclick="applySyncCode()">Übernehmen</button>
-          </div>
-        </div>
-        <div style="font-size:0.82rem; color:var(--text-light);">
-          <span class="sync-status-dot" id="syncStatusDot"></span><span id="syncStatusText">Noch nicht synchronisiert</span>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="manualSync()" style="align-self:flex-start;">Jetzt synchronisieren</button>
       </div>
     </div>
 
@@ -2339,6 +2310,45 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 <!-- ============================================================
      NOTFALL-OVERLAY
      ============================================================ -->
+<!-- ============================================================
+     LOGIN MODAL
+     ============================================================ -->
+<div class="overlay hidden" id="loginModal" role="dialog" aria-modal="true" aria-label="Anmelden">
+  <div class="overlay-card" style="max-width:380px;">
+    <button class="overlay-close" onclick="closeLoginModal()" aria-label="Schließen">✕</button>
+
+    <!-- Eingeloggt -->
+    <div id="loginStateLoggedIn" class="hidden">
+      <div class="overlay-title" style="margin-bottom:0.25rem;">Angemeldet</div>
+      <div id="loginUserEmail" class="login-hint" style="margin-bottom:1.25rem;"></div>
+      <div id="loginSyncStatus" class="sync-status-line" style="margin-bottom:1.25rem;">
+        <span class="sync-dot" id="loginSyncDot"></span><span id="loginSyncText">—</span>
+      </div>
+      <button class="btn btn-outline" onclick="manualSync()" style="width:100%; margin-bottom:0.5rem;">Jetzt synchronisieren</button>
+      <button class="btn btn-outline" onclick="doSignOut()" style="width:100%; color:var(--terracotta);">Abmelden</button>
+    </div>
+
+    <!-- Schritt 1: E-Mail -->
+    <div id="loginStep1" class="login-step">
+      <div class="overlay-title" style="margin-bottom:0.25rem;">Anmelden</div>
+      <p class="login-hint">Kein Passwort nötig — du bekommst einen 6-stelligen Code per E-Mail.</p>
+      <input type="email" id="loginEmail" placeholder="deine@email.ch" autocomplete="email" style="width:100%;">
+      <button class="btn btn-primary" onclick="sendLoginOtp()" style="width:100%;">Code senden</button>
+    </div>
+
+    <!-- Schritt 2: OTP -->
+    <div id="loginStep2" class="login-step hidden">
+      <div class="overlay-title" style="margin-bottom:0.25rem;">Code eingeben</div>
+      <p class="login-hint">Code gesendet an <strong id="loginEmailDisplay"></strong></p>
+      <input type="text" id="loginOtp" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" style="width:100%;">
+      <button class="btn btn-primary" onclick="verifyLoginOtp()" style="width:100%;">Anmelden</button>
+      <button class="btn btn-outline" onclick="backToEmail()" style="width:100%;">Andere E-Mail</button>
+    </div>
+
+    <div id="loginStatusMsg" class="login-status" style="display:none;"></div>
+  </div>
+</div>
+
 <div class="overlay hidden" id="emergencyOverlay" role="dialog" aria-modal="true" aria-label="Notfall-Unterstützung">
   <div class="overlay-card">
 
@@ -2758,205 +2768,230 @@ function migrateSchema() {
 }
 
 // ============================================================
-// GERÄTE-SYNC (Supabase, offline-first, sync-code-based)
+// GERÄTE-SYNC — Auth-basiert (Supabase, E-Mail OTP, offline-first)
 // ============================================================
 const SB_URL = 'https://uyeezuskvzdxvjbdkmdy.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZWV6dXNrdnpkeHZqYmRrbWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MzA5MzksImV4cCI6MjA5NjEwNjkzOX0.TBJb7onesjE8IUO8p7g4paMWmtT1qzFJR2FSbUihqoI';
-const SYNC_STORAGE_KEY = 'passerelle_sync';
+let sbClient = null;
 let syncPushTimer = null;
 
-function loadSyncConfig() {
-  try { return JSON.parse(localStorage.getItem(SYNC_STORAGE_KEY)) || null; }
-  catch { return null; }
-}
-function saveSyncConfig(cfg) {
-  localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(cfg));
+function initSupabase() {
+  if (typeof window.supabase === 'undefined') return; // SDK nicht geladen (offline)
+  sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 }
 
-function generateSyncCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 9; i++) {
-    if (i === 4) { code += '-'; continue; }
-    code += chars[Math.floor(Math.random() * chars.length)];
+async function sbUser() {
+  if (!sbClient) return null;
+  const { data: { user } } = await sbClient.auth.getUser();
+  return user;
+}
+
+// ---- Auth ----
+
+async function sendLoginOtp() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return;
+  setLoginStatus('', 'Code wird gesendet…');
+  try {
+    const { error } = await sbClient.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+    if (error) throw error;
+    document.getElementById('loginEmailDisplay').textContent = email;
+    document.getElementById('loginStep1').classList.add('hidden');
+    document.getElementById('loginStep2').classList.remove('hidden');
+    document.getElementById('loginOtp').focus();
+    setLoginStatus('', '');
+  } catch (e) {
+    setLoginStatus('err', 'Fehler beim Senden: ' + (e.message || e));
   }
-  return code; // Format: XXXX-XXXX
 }
 
-async function syncPush(cfg) {
-  const payload = JSON.stringify(state);
-  const res = await fetch(`${SB_URL}/rest/v1/sync_data`, {
-    method: 'POST',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': `Bearer ${SB_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify({ sync_code: cfg.code, payload: JSON.parse(payload) })
+async function verifyLoginOtp() {
+  const email = document.getElementById('loginEmailDisplay').textContent;
+  const token = document.getElementById('loginOtp').value.trim();
+  if (token.length < 6) return;
+  setLoginStatus('', 'Wird überprüft…');
+  try {
+    const { error } = await sbClient.auth.verifyOtp({ email, token, type: 'email' });
+    if (error) throw error;
+    setLoginStatus('ok', 'Angemeldet!');
+    setTimeout(async () => {
+      closeLoginModal();
+      await onLoginSuccess();
+    }, 600);
+  } catch {
+    setLoginStatus('err', 'Ungültiger Code. Bitte erneut versuchen.');
+  }
+}
+
+function backToEmail() {
+  document.getElementById('loginStep2').classList.add('hidden');
+  document.getElementById('loginStep1').classList.remove('hidden');
+  document.getElementById('loginOtp').value = '';
+  setLoginStatus('', '');
+}
+
+async function doSignOut() {
+  if (sbClient) await sbClient.auth.signOut();
+  closeLoginModal();
+  updateAuthBtn(null);
+}
+
+// ---- Sync ----
+
+async function syncPush() {
+  const user = await sbUser();
+  if (!user || !sbClient) return;
+  const { error } = await sbClient.from('user_data').upsert({
+    user_id: user.id,
+    payload: state,
+    updated_at: new Date().toISOString()
   });
-  if (!res.ok) throw new Error(`Push fehlgeschlagen: ${res.status}`);
-  cfg.lastPush = new Date().toISOString();
-  saveSyncConfig(cfg);
+  if (error) throw error;
 }
 
-async function syncPull(cfg) {
-  const res = await fetch(
-    `${SB_URL}/rest/v1/sync_data?sync_code=eq.${encodeURIComponent(cfg.code)}&select=payload,updated_at`,
-    { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }
-  );
-  if (!res.ok) throw new Error(`Pull fehlgeschlagen: ${res.status}`);
-  const rows = await res.json();
-  if (!rows.length) return false; // Noch nichts in der Cloud
-  const remote = rows[0];
-  const remoteAt = new Date(remote.updated_at).getTime();
-  const lastPull = cfg.lastPull ? new Date(cfg.lastPull).getTime() : 0;
-  if (remoteAt <= lastPull) return false; // Nichts Neues
-  // Remote-Daten einlesen (sicher: loadFromStorage-Logik wiederverwenden)
-  const parsed = remote.payload;
-  if (parsed.tasks    && Array.isArray(parsed.tasks))    state.tasks    = parsed.tasks;
-  if (parsed.sessions && Array.isArray(parsed.sessions)) state.sessions = parsed.sessions;
-  if (parsed.journal  && Array.isArray(parsed.journal))  state.journal  = parsed.journal;
-  if (parsed.reviews  && Array.isArray(parsed.reviews))  state.reviews  = parsed.reviews;
-  if (parsed.egalWenn && Array.isArray(parsed.egalWenn)) state.egalWenn = parsed.egalWenn;
-  if (parsed.srCards  && Array.isArray(parsed.srCards))  state.srCards  = parsed.srCards;
-  if (parsed.triage   && typeof parsed.triage  === 'object') state.triage   = parsed.triage;
+async function syncPull() {
+  const user = await sbUser();
+  if (!user || !sbClient) return null;
+  const { data, error } = await sbClient.from('user_data')
+    .select('payload, updated_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data;
+}
+
+function applyRemotePayload(parsed) {
+  if (Array.isArray(parsed.tasks))    state.tasks    = parsed.tasks;
+  if (Array.isArray(parsed.sessions)) state.sessions = parsed.sessions;
+  if (Array.isArray(parsed.journal))  state.journal  = parsed.journal;
+  if (Array.isArray(parsed.reviews))  state.reviews  = parsed.reviews;
+  if (Array.isArray(parsed.egalWenn)) state.egalWenn = parsed.egalWenn;
+  if (Array.isArray(parsed.srCards))  state.srCards  = parsed.srCards;
+  if (parsed.triage   && typeof parsed.triage   === 'object') state.triage   = parsed.triage;
   if (parsed.weekPlan && typeof parsed.weekPlan === 'object') state.weekPlan = parsed.weekPlan;
-  if (parsed.noten    && typeof parsed.noten   === 'object') state.noten    = { ...state.noten, ...parsed.noten };
+  if (parsed.noten    && typeof parsed.noten    === 'object') state.noten    = { ...state.noten, ...parsed.noten };
   if (parsed.settings && typeof parsed.settings === 'object') state.settings = { ...state.settings, ...parsed.settings };
   if (typeof parsed.motIndex === 'number') state.motIndex = parsed.motIndex;
-  saveNow();
-  cfg.lastPull = new Date().toISOString();
-  saveSyncConfig(cfg);
-  return true;
 }
 
 function scheduleSyncPush() {
-  const cfg = loadSyncConfig();
-  if (!cfg || !cfg.enabled) return;
   clearTimeout(syncPushTimer);
   syncPushTimer = setTimeout(async () => {
     try {
-      await syncPush(cfg);
-      setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
-    } catch {
-      setSyncStatus('err', 'Offline – Daten lokal gespeichert');
-    }
+      await syncPush();
+      setSyncStatusLine('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+    } catch { /* offline – still ok */ }
   }, 3000);
 }
 
 async function initSyncOnLoad() {
-  const cfg = loadSyncConfig();
-  if (!cfg || !cfg.enabled) return;
-  // UI sofort einrichten
-  renderSyncPanel(cfg);
+  initSupabase();
+  if (!sbClient) return;
+  const user = await sbUser();
+  updateAuthBtn(user);
+  if (!user) return;
   try {
-    setSyncStatus('', 'Synchronisiere…');
-    const pulled = await syncPull(cfg);
-    if (pulled) {
-      renderAll();
-      setSyncStatus('ok', `Daten vom anderen Gerät geladen`);
-    } else {
-      await syncPush(cfg);
-      setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
-    }
+    const remote = await syncPull();
+    if (remote) { applyRemotePayload(remote.payload); saveNow(); renderAll(); }
+    else await syncPush();
+    setSyncStatusLine('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
   } catch {
-    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+    setSyncStatusLine('err', 'Offline – Daten lokal gespeichert');
   }
 }
 
-// ---- UI ----
-
-function renderSyncPanel(cfg) {
-  const toggle = document.getElementById('syncToggle');
-  const panel  = document.getElementById('syncPanel');
-  if (!toggle || !panel) return;
-  toggle.checked = cfg && cfg.enabled;
-  if (cfg && cfg.enabled) {
-    panel.classList.remove('hidden');
-    document.getElementById('syncCodeDisplay').textContent = cfg.code;
-  } else {
-    panel.classList.add('hidden');
-  }
-}
-
-function setSyncStatus(type, msg) {
-  const dot  = document.getElementById('syncStatusDot');
-  const text = document.getElementById('syncStatusText');
-  if (!dot || !text) return;
-  dot.className  = 'sync-status-dot' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
-  text.textContent = msg;
-}
-
-function onSyncToggle(enabled) {
-  let cfg = loadSyncConfig() || {};
-  cfg.enabled = enabled;
-  if (!cfg.code) cfg.code = generateSyncCode();
-  saveSyncConfig(cfg);
-  renderSyncPanel(cfg);
-  if (enabled) {
-    syncPush(cfg)
-      .then(() => setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`))
-      .catch(() => setSyncStatus('err', 'Offline – Daten lokal gespeichert'));
-  }
-}
-
-function copySyncCode() {
-  const cfg = loadSyncConfig();
-  if (!cfg) return;
-  navigator.clipboard.writeText(cfg.code).then(() => {
-    const btn = document.querySelector('#syncPanel button');
-    const orig = btn.textContent;
-    btn.textContent = 'Kopiert!';
-    setTimeout(() => btn.textContent = orig, 1500);
-  });
-}
-
-function showSyncCodeInput() {
-  const area = document.getElementById('syncCodeInputArea');
-  const btn  = document.getElementById('showSyncInputBtn');
-  area.classList.toggle('hidden');
-  if (!area.classList.contains('hidden')) {
-    btn.textContent = 'Abbrechen';
-    document.getElementById('syncCodeInput').focus();
-  } else {
-    btn.textContent = 'Anderen Code eingeben';
-  }
-}
-
-async function applySyncCode() {
-  const input = document.getElementById('syncCodeInput').value.trim().toUpperCase();
-  if (input.length < 8) { alert('Bitte einen gültigen Code eingeben (z.B. X7K2-M4NP)'); return; }
-  let cfg = loadSyncConfig() || { enabled: true };
-  cfg.code = input;
-  cfg.enabled = true;
-  cfg.lastPull = null;
-  saveSyncConfig(cfg);
-  renderSyncPanel(cfg);
-  document.getElementById('syncCodeInputArea').classList.add('hidden');
-  document.getElementById('showSyncInputBtn').textContent = 'Anderen Code eingeben';
-  setSyncStatus('', 'Synchronisiere…');
+async function onLoginSuccess() {
+  const user = await sbUser();
+  updateAuthBtn(user);
+  setSyncStatusLine('', 'Synchronisiere…');
   try {
-    const pulled = await syncPull(cfg);
-    if (pulled) { renderAll(); setSyncStatus('ok', 'Daten geladen'); }
-    else { await syncPush(cfg); setSyncStatus('ok', 'Verbunden'); }
+    const remote = await syncPull();
+    if (remote) { applyRemotePayload(remote.payload); saveNow(); renderAll(); }
+    else await syncPush();
+    setSyncStatusLine('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+    showLoginLoggedIn(user);
   } catch {
-    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+    setSyncStatusLine('err', 'Offline – Daten lokal gespeichert');
   }
 }
 
 async function manualSync() {
-  const cfg = loadSyncConfig();
-  if (!cfg || !cfg.enabled) return;
-  setSyncStatus('', 'Synchronisiere…');
+  setSyncStatusLine('', 'Synchronisiere…');
   try {
-    const pulled = await syncPull(cfg);
-    if (pulled) renderAll();
-    await syncPush(cfg);
-    setSyncStatus('ok', `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`);
+    const remote = await syncPull();
+    if (remote) { applyRemotePayload(remote.payload); saveNow(); renderAll(); }
+    await syncPush();
+    const msg = `Synchronisiert ${new Date().toLocaleTimeString('de-CH', {hour:'2-digit', minute:'2-digit'})}`;
+    setSyncStatusLine('ok', msg);
+    document.getElementById('loginSyncText').textContent = msg;
+    document.getElementById('loginSyncDot').className = 'sync-dot ok';
   } catch {
-    setSyncStatus('err', 'Offline – Daten lokal gespeichert');
+    setSyncStatusLine('err', 'Offline – Daten lokal gespeichert');
   }
+}
+
+// ---- UI helpers ----
+
+function updateAuthBtn(user) {
+  const btn = document.getElementById('authBtn');
+  if (!btn) return;
+  if (user) {
+    const initials = (user.email || '?')[0].toUpperCase();
+    btn.textContent = initials;
+    btn.classList.add('auth-btn-avatar');
+    btn.classList.remove('btn-outline');
+    btn.title = user.email;
+  } else {
+    btn.textContent = 'Anmelden';
+    btn.classList.remove('auth-btn-avatar');
+    btn.classList.add('btn-outline');
+    btn.title = '';
+  }
+}
+
+function setSyncStatusLine(type, msg) {
+  const dot  = document.getElementById('loginSyncDot');
+  const text = document.getElementById('loginSyncText');
+  if (dot)  dot.className  = 'sync-dot' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
+  if (text) text.textContent = msg;
+}
+
+function setLoginStatus(type, msg) {
+  const el = document.getElementById('loginStatusMsg');
+  if (!el) return;
+  if (!msg) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.className = 'login-status ' + type;
+  el.textContent = msg;
+}
+
+function showLoginLoggedIn(user) {
+  document.getElementById('loginStep1').classList.add('hidden');
+  document.getElementById('loginStep2').classList.add('hidden');
+  document.getElementById('loginStateLoggedIn').classList.remove('hidden');
+  document.getElementById('loginUserEmail').textContent = user.email;
+}
+
+async function onAuthBtnClick() {
+  const modal = document.getElementById('loginModal');
+  modal.classList.remove('hidden');
+  const user = await sbUser();
+  if (user) {
+    showLoginLoggedIn(user);
+    const remote = await syncPull().catch(() => null);
+    const ts = remote ? new Date(remote.updated_at).toLocaleTimeString('de-CH', {hour:'2-digit',minute:'2-digit'}) : '—';
+    document.getElementById('loginSyncText').textContent = remote ? `Zuletzt synchronisiert ${ts}` : 'Noch nicht synchronisiert';
+    document.getElementById('loginSyncDot').className = 'sync-dot' + (remote ? ' ok' : '');
+  } else {
+    document.getElementById('loginStateLoggedIn').classList.add('hidden');
+    document.getElementById('loginStep1').classList.remove('hidden');
+    document.getElementById('loginStep2').classList.add('hidden');
+  }
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').classList.add('hidden');
+  setLoginStatus('', '');
 }
 
 // Migration: jedes Thema bekommt ein lernziele-Array; jedes Lernziel ein sub-Array.
@@ -4830,8 +4865,7 @@ loadFromStorage();
 migrateTriage(); // auch für Erstbesucher (Default-Themen) das lernziele-Feld sicherstellen
 migrateSchema(); // SR-Deck-Felder auch für Erstbesucher sicherstellen
 renderAll();
-initSyncOnLoad(); // Sync: Pull beim Start, async, blockiert App nicht
-renderSyncPanel(loadSyncConfig()); // Sync-UI initialisieren
+initSyncOnLoad(); // Auth-Sync: Session prüfen + Pull beim Start, blockiert App nicht
 // Erster Besuch: Name + Prüfungsdatum abfragen
 if (!state.settings.name) showOnboarding();
 setInterval(renderGreeting, 60000); // Begrüssung stündlich aktualisieren
