@@ -2315,7 +2315,7 @@ Inhalte anpassen (ohne Programmierkenntnisse):
 <!-- ============================================================
      LOGIN MODAL
      ============================================================ -->
-<div class="overlay hidden" id="loginModal" role="dialog" aria-modal="true" aria-label="Anmelden">
+<div class="overlay hidden" id="loginModal" role="dialog" aria-modal="true" aria-label="Anmelden" onclick="if(event.target===this)closeLoginModal()">
   <div class="overlay-card login-card-wrap" style="max-width:380px;">
     <button class="login-close-btn" onclick="closeLoginModal()" aria-label="Schließen">✕</button>
 
