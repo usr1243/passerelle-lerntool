@@ -1438,11 +1438,13 @@ Inhalte anpassen (ohne Programmierkenntnisse):
       .greeting-title { font-size: 1.5rem; }
     }
     /* Auth-Login-Modal */
-    .auth-btn-avatar { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:var(--green); color:#fff; font-size:0.75rem; font-weight:700; border:none; cursor:pointer; }
+    .auth-btn-avatar { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; min-width:32px; min-height:32px; border-radius:50%; background:var(--terracotta); color:#fff; font-size:0.8rem; font-weight:700; border:none; cursor:pointer; padding:0; line-height:1; }
     .login-step { display:flex; flex-direction:column; gap:0.6rem; }
     .otp-input { font-size:1.6rem; text-align:center; letter-spacing:0.35em; font-family:monospace; padding:0.5rem; }
     .login-hint { font-size:0.82rem; color:var(--text-light); }
     .login-status { font-size:0.84rem; padding:0.4rem 0.6rem; border-radius:var(--radius-sm); margin-top:0.25rem; }
+    .login-card-wrap { position:relative; }
+    .login-close-btn { position:absolute; top:1rem; right:1rem; width:36px; height:36px; border-radius:50%; background:var(--bg-subtle); border:none; cursor:pointer; font-size:1rem; color:var(--text-light); display:flex; align-items:center; justify-content:center; line-height:1; }
     .login-status.err { background:#fdecea; color:var(--terracotta); }
     .login-status.ok  { background:#e8f5e9; color:#2e7d32; }
     .sync-status-line { font-size:0.8rem; color:var(--text-light); margin-top:0.3rem; }
@@ -2314,17 +2316,16 @@ Inhalte anpassen (ohne Programmierkenntnisse):
      LOGIN MODAL
      ============================================================ -->
 <div class="overlay hidden" id="loginModal" role="dialog" aria-modal="true" aria-label="Anmelden">
-  <div class="overlay-card" style="max-width:380px;">
-    <button class="overlay-close" onclick="closeLoginModal()" aria-label="Schließen">✕</button>
+  <div class="overlay-card login-card-wrap" style="max-width:380px;">
+    <button class="login-close-btn" onclick="closeLoginModal()" aria-label="Schließen">✕</button>
 
     <!-- Eingeloggt -->
     <div id="loginStateLoggedIn" class="hidden">
       <div class="overlay-title" style="margin-bottom:0.25rem;">Angemeldet</div>
-      <div id="loginUserEmail" class="login-hint" style="margin-bottom:1.25rem;"></div>
-      <div id="loginSyncStatus" class="sync-status-line" style="margin-bottom:1.25rem;">
+      <div id="loginUserEmail" class="login-hint" style="margin-bottom:1rem;"></div>
+      <div id="loginSyncStatus" class="sync-status-line" style="margin-bottom:1.5rem;">
         <span class="sync-dot" id="loginSyncDot"></span><span id="loginSyncText">—</span>
       </div>
-      <button class="btn btn-outline" onclick="manualSync()" style="width:100%; margin-bottom:0.5rem;">Jetzt synchronisieren</button>
       <button class="btn btn-outline" onclick="doSignOut()" style="width:100%; color:var(--terracotta);">Abmelden</button>
     </div>
 
