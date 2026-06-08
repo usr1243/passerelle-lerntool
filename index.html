@@ -47,7 +47,9 @@
       "Pomodoro-Timer",
       "Wochenplan und Fortschritts-Übersicht",
       "Offline nutzbar, keine Anmeldung"
-    ]
+    ],
+    "datePublished": "2024-01-01",
+    "dateModified": "2026-06-08"
   }
   </script>
 
@@ -68,6 +70,95 @@
       { "@type": "Question", "name": "Eignet sich das Tool auch für die Passerelle in Basel?",
         "acceptedAnswer": { "@type": "Answer", "text": "Ja. Es richtet sich an alle, die die Ergänzungsprüfung Passerelle (Berufs-/Fachmaturität zur Uni/ETH) vorbereiten. Die Inhalte orientieren sich u.a. am Lehrgang in Basel, eignen sich aber schweizweit." } }
     ]
+  }
+  </script>
+
+  <!-- ===== Structured Data: Organization + knowsAbout (AI Mode Signal) ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Passerelle Lerntool",
+    "url": "https://usr1243.github.io/passerelle-lerntool/",
+    "description": "Kostenloses Lernwerkzeug für die Ergänzungsprüfung Passerelle (Berufsmaturität zur Universität und ETH)",
+    "knowsAbout": [
+      "Passerelle-Prüfung Schweiz",
+      "Ergänzungsprüfung Berufsmaturität Universität ETH",
+      "Spaced Repetition Lernmethode",
+      "Karteikarten-Lernsystem",
+      "Pomodoro-Technik Zeitmanagement",
+      "Lernplanung und Prüfungsvorbereitung",
+      "Aktiver Abruf als Lerntechnik",
+      "Schweizer Bildungssystem Berufs- und Fachmaturität"
+    ],
+    "sameAs": [
+      "https://github.com/usr1243/passerelle-lerntool"
+    ]
+  }
+  </script>
+
+  <!-- ===== Structured Data: HowTo (Ersatz für FAQPage Rich Results) ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Passerelle-Prüfung bestehen: Schritt-für-Schritt-Lernplan",
+    "description": "So bereitest du dich systematisch auf die Ergänzungsprüfung Passerelle vor – von der Stoffpriorisierung bis zum Prüfungstag.",
+    "totalTime": "PT1500H",
+    "tool": [{ "@type": "HowToTool", "name": "Passerelle Lerntool (kostenlos, direkt im Browser)" }],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Stoff priorisieren mit Triage",
+        "text": "Trage alle Lernziele ein und kategorisiere sie nach Wichtigkeit: Pflicht, wichtig oder optional. So erkennst du sofort, womit du anfangen sollst und was du notfalls weglassen kannst.",
+        "url": "https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Karteikarten erstellen und mit Spaced Repetition lernen",
+        "text": "Erstelle Karteikarten zu den Pflichtthemen. Das SM-2-Algorithmus-System zeigt dir jede Karte genau dann wieder, wenn du sie zu vergessen drohst – effektiver als blosses Wiederlesen.",
+        "url": "https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Realistischen Wochenplan erstellen",
+        "text": "Plane deine Lernwochen mit festen Blöcken pro Fach. Berücksichtige Fixpunkte und plane Puffer für stressige Phasen. Verteile die rund 1500 Stunden Lernzeit gleichmässig.",
+        "url": "https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Mit Pomodoro-Timer fokussiert arbeiten",
+        "text": "Lerne in 25-Minuten-Blöcken mit 5-Minuten-Pausen. Der eingebaute Timer strukturiert deine Lernsessions und verhindert mentale Erschöpfung.",
+        "url": "https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Wissen mit Selbsttests überprüfen",
+        "text": "Teste deinen Lernstand regelmässig mit prüfungsnahen Fragen aus deinen eigenen Lernzielen. Aktiver Abruf ist wissenschaftlich belegt wirksamer als passives Wiederholen.",
+        "url": "https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html"
+      }
+    ]
+  }
+  </script>
+
+  <!-- ===== Structured Data: SpeakableSpecification (Voice / AI-Agent) ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Passerelle bestehen – kostenloses Lerntool & Lernplaner",
+    "url": "https://usr1243.github.io/passerelle-lerntool/",
+    "dateModified": "2026-06-08",
+    "datePublished": "2024-01-01",
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": ["h1", ".lead", ".intro", "[data-speakable]"]
+    }
   }
   </script>
 
@@ -144,7 +235,7 @@
       </section>
 
       <section id="intro">
-        <p class="intro">Die <strong>Passerelle-Prüfung</strong> (Ergänzungsprüfung von der Berufs- oder Fachmaturität zur Universität und ETH) verlangt rund 1 500 Stunden Lernzeit über viele Fächer. Die meisten scheitern nicht am Schwierigkeitsgrad, sondern an der Stoffmenge und der fehlenden Struktur. Dieses <strong>Passerelle-Lerntool</strong> hilft dir, den Stoff zu ordnen, mit <strong>Karteikarten</strong> und <strong>Lernquiz</strong> aktiv zu lernen und deine Woche realistisch zu planen – kostenlos und direkt im Browser.</p>
+        <p class="intro" data-speakable>Die <strong>Passerelle-Prüfung</strong> (Ergänzungsprüfung von der Berufs- oder Fachmaturität zur Universität und ETH) verlangt rund 1 500 Stunden Lernzeit über viele Fächer. Die meisten scheitern nicht am Schwierigkeitsgrad, sondern an der Stoffmenge und der fehlenden Struktur. Dieses <strong>Passerelle-Lerntool</strong> hilft dir, den Stoff zu ordnen, mit <strong>Karteikarten</strong> und <strong>Lernquiz</strong> aktiv zu lernen und deine Woche realistisch zu planen – kostenlos und direkt im Browser.</p>
       </section>
 
       <section id="funktionen">

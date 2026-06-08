@@ -1,0 +1,25 @@
+# Passerelle Lerntool
+
+> Kostenloses Browser-Tool für die Ergänzungsprüfung Passerelle (Berufsmaturität oder Fachmaturität → Universität / ETH Zürich). Kein Konto, kein Download, keine Werbung – offline nutzbar.
+
+## Tool
+- [Passerelle Lerntool](https://usr1243.github.io/passerelle-lerntool/passerelle_lerntool.html): Vollständige Lernapp mit Stoff-Triage, Karteikarten (Spaced Repetition SM-2), Lernquiz, Wochenplan, Pomodoro-Timer und Cloud-Sync
+
+## Landing Page
+- [Übersicht und Funktionen](https://usr1243.github.io/passerelle-lerntool/): Feature-Erklärung, FAQ, Einstieg ins Tool
+
+## Funktionen im Detail
+- **Stoff-Triage**: Lernziele nach Wichtigkeit kategorisieren (Pflicht / wichtig / optional) – sofort sichtbar, was zählt
+- **Karteikarten mit Spaced Repetition**: SM-2-Algorithmus plant Wiederholungen automatisch; jede Karte erscheint genau zum richtigen Zeitpunkt
+- **Selbsttest / Lernquiz**: Prüfungsnahe Fragen aus eigenen Lernzielen; aktiver Abruf ist wirksamer als Wiederlesen
+- **Wochenplan**: Lernwochen mit Fachblöcken planen, Fixpunkte und Puffer berücksichtigen
+- **Pomodoro-Timer**: 25-Minuten-Fokusblöcke mit 5-Minuten-Pausen
+- **Fortschritt-Übersicht**: Wochenrückblick, Fach-Fortschritt, Notfall-Modus
+- **Offline-fähig**: Alle Daten im Browser (localStorage), kein Server nötig
+- **Cloud-Sync** (optional): Einloggen mit E-Mail → Daten geräteübergreifend synchronisiert
+
+## Kontext: Was ist die Passerelle-Prüfung?
+Die Ergänzungsprüfung Passerelle ist eine schweizweit anerkannte Prüfung für Absolventinnen und Absolventen der Berufs- oder Fachmaturität, die an einer universitären Hochschule (Universität, ETH Zürich, ETH Lausanne) studieren möchten. Sie umfasst ca. 1500 Stunden Lernzeit über mehrere Fächer: Mathematik, Deutsch, Französisch oder Englisch, Naturwissenschaften (Biologie, Chemie, Physik) und Geisteswissenschaften. Angeboten wird die Prüfung u.a. in Basel, Zürich, Bern und weiteren Schweizer Städten.
+
+## Zielgruppe
+Berufsmaturanden und Fachmaturanden in der Schweiz, die den Zugang zur Universität oder ETH anstreben.
